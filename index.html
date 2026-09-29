@@ -52,6 +52,11 @@ td.pending{color:var(--muted)}
 td.total{font-weight:700;color:var(--ink)}
 tr.notroster td:first-child small{display:block;font-weight:400;color:var(--muted);font-size:10.5px}
 .fnote{font-size:12px;color:var(--muted);margin:0}
+.seg{display:inline-flex;border:1px solid var(--line-2);border-radius:8px;overflow:hidden}
+.seg button{font:500 12.5px var(--body);border:0;background:transparent;color:var(--ink-2);padding:6px 12px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line-2)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff}
+.phead{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
 footer{color:var(--muted);font-size:12px;border-top:1px solid var(--line);padding-top:14px}
 </style>
 </head><body>
@@ -106,42 +111,96 @@ footer{color:var(--muted);font-size:12px;border-top:1px solid var(--line);paddin
   </section>
 
   <section class="panel" aria-label="Facilitator roster across all KRAs">
-    <h2>Facilitator roster &mdash; across all 5 KRAs</h2>
-    <p class="desc">The same 12-member Training Department roster (from the Coaching &amp; Feedback scorecard, the
-      Training Program &amp; Delivery Monitoring 2026 facilitator list, and the TDD Team Attendance Monitoring 2026
-      team-member list) ties every module together. Only Coaching &amp; Feedback has real logged data so far
-      (Jul&ndash;Sep 2026); the other four modules' sheets are live but not yet filled in, so their columns read
-      &ldquo;pending&rdquo; per person until real entries land there &mdash; this table will fill in on its own as
-      that happens, with no restructuring needed.</p>
+    <div class="phead">
+      <h2>Facilitator roster &mdash; across all 5 KRAs</h2>
+      <div class="seg" id="monthSeg" role="group" aria-label="Month">
+        <button type="button" data-m="all" aria-pressed="true">All months</button>
+        <button type="button" data-m="07" aria-pressed="false">Jul</button>
+        <button type="button" data-m="08" aria-pressed="false">Aug</button>
+        <button type="button" data-m="09" aria-pressed="false">Sep</button>
+      </div>
+    </div>
+    <p class="desc">Roster is the 12 names that actually appear in <b>[sys] STORE VISIT 2026</b>'s Visitor Leaderboard
+      (the live store-visit system, not the pilot sheets' own facilitator lists) &mdash; per instruction, that's the
+      source of truth for who's on this roster. Every KPI here is meant to be computed per month, not as a single
+      cumulative figure; the Coaching &amp; Feedback column already is, from real Jul&ndash;Sep 2026 survey data, and
+      switches with the month filter above. The other four columns don't have monthly (or any) real data yet, so they
+      stay &ldquo;pending&rdquo; regardless of month &mdash; see the footnote for what's still open.</p>
     <div class="tscroll">
-      <table>
+      <table id="rosterTable">
         <thead><tr>
           <th>Facilitator</th><th>Attendance<br>10%</th><th>Store Visit<br>Compliance 25%</th>
           <th>Staff Proficiency<br>25%</th><th>Training Program<br>Delivery 20%</th>
           <th>Coaching &amp; Feedback<br>20%</th><th>Partial total</th>
         </tr></thead>
-        <tbody>
-          <tr><td>Alex Rivera</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td>19.76</td><td class="total">19.76 / 100</td></tr>
-          <tr><td>Alliana (Yana) Papa</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td>16.76</td><td class="total">16.76 / 100</td></tr>
-          <tr><td>Ann Barredo</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td>18.64</td><td class="total">18.64 / 100</td></tr>
-          <tr><td>Charlie Moises</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">no evals this period</td><td class="total">&mdash;</td></tr>
-          <tr><td>Daniel De Leon</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td>19.84</td><td class="total">19.84 / 100</td></tr>
-          <tr><td>Geoffrey Carranceja</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">no evals this period</td><td class="total">&mdash;</td></tr>
-          <tr><td>James Nacionales</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td>17.24</td><td class="total">17.24 / 100</td></tr>
-          <tr><td>Josh Earnshaw</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td>20.00</td><td class="total">20.00 / 100</td></tr>
-          <tr><td>Leo Fernandez</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td>19.68</td><td class="total">19.68 / 100</td></tr>
-          <tr><td>Nica Tardio</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td>18.20</td><td class="total">18.20 / 100</td></tr>
-          <tr><td>Ricelle (Rice) Lim</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td>19.72</td><td class="total">19.72 / 100</td></tr>
-          <tr><td>Ver Guerrero</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td>18.84</td><td class="total">18.84 / 100</td></tr>
-          <tr class="notroster"><td>Team Effort<br><small>shared-credit entries, not an individual roster member</small></td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td>18.84</td><td class="total">18.84 / 100</td></tr>
-        </tbody>
+        <tbody></tbody>
       </table>
     </div>
-    <p class="fnote">Coaching &amp; Feedback column = (facilitator's Jul&ndash;Sep 2026 average rating &divide; 5) &times; 20% weight, from
-      pages/coaching-feedback.html. Sky, Dennis and Jov Palattao also appear in Coaching &amp; Feedback evaluations but
-      aren't on the official TDD roster in the other four sheets, so they're left off this cross-KRA table &mdash;
-      see the facilitator scorecard for their individual numbers.</p>
+    <p class="fnote" id="rosterNote"></p>
   </section>
+
+  <script>
+  // Coaching & Feedback: real per-month figures computed from the same 170-response
+  // dataset embedded in pages/coaching-feedback.html (DATA.recs), grouped by month
+  // and by facilitator, score = (mean of that record's 15 criteria / 5) * 20% weight.
+  const COACHING = {
+    all: {"Leo Fernandez":{n:34,score:19.68},"Ann Barredo":{n:16,score:18.63},"Ver Guerrero":{n:26,score:18.85},
+      "James Nacionales":{n:7,score:17.26},"Alex Rivera":{n:60,score:19.76},"Alliana (Yana) Papa":{n:10,score:16.75},
+      "Sky":{n:16,score:18.73},"Ricelle (Rice) Lim":{n:1,score:19.73},"Josh Earnshaw":{n:7,score:20.00},
+      "Daniel De Leon":{n:21,score:19.82},"Team Effort":{n:26,score:18.83}},
+    "07": {"Leo Fernandez":{n:5,score:19.04},"Ann Barredo":{n:14,score:18.44},"Ver Guerrero":{n:6,score:19.20},
+      "James Nacionales":{n:5,score:19.36},"Alliana (Yana) Papa":{n:1,score:4.00},"Sky":{n:14,score:18.55},
+      "Daniel De Leon":{n:16,score:19.77},"Team Effort":{n:6,score:17.82}},
+    "08": {"Leo Fernandez":{n:27,score:19.77},"Ver Guerrero":{n:10,score:19.15},"James Nacionales":{n:1,score:20.00},
+      "Alex Rivera":{n:31,score:19.66},"Sky":{n:2,score:20.00},"Ricelle (Rice) Lim":{n:1,score:19.73},
+      "Daniel De Leon":{n:5,score:20.00},"Team Effort":{n:20,score:19.12}},
+    "09": {"Leo Fernandez":{n:2,score:20.00},"Ann Barredo":{n:2,score:20.00},"Ver Guerrero":{n:10,score:18.35},
+      "James Nacionales":{n:1,score:4.00},"Alex Rivera":{n:29,score:19.87},"Alliana (Yana) Papa":{n:9,score:18.16},
+      "Josh Earnshaw":{n:7,score:20.00}}
+  };
+  // Roster sourced from the Store Visit Visitor Leaderboard (EXECUTIVE SUMMARY tab of
+  // [sys] STORE VISIT 2026), not the pilot sheets' own lists.
+  const ROSTER = ["Alex Rivera","Alliana (Yana) Papa","Ann Barredo","Charlie Moises","Daniel De Leon",
+    "Geoffrey Carranceja","James Nacionales","Josh Earnshaw","Leo Fernandez","Ricelle (Rice) Lim","Sky","Ver Guerrero"];
+
+  function renderRoster(month) {
+    const cm = COACHING[month] || {};
+    const tbody = document.querySelector('#rosterTable tbody');
+    const rows = ROSTER.map(name => {
+      const c = cm[name];
+      const coach = c ? c.score.toFixed(2) : null;
+      const total = coach ? `${coach} / 100` : '&mdash;';
+      const coachCell = coach ? `<td>${coach}</td>` : `<td class="pending">no evals this period</td>`;
+      return `<tr><td>${name}</td><td class="pending">pending</td><td class="pending">pending</td>` +
+        `<td class="pending">pending</td><td class="pending">pending</td>${coachCell}<td class="total">${total}</td></tr>`;
+    });
+    const te = cm['Team Effort'];
+    const teCoach = te ? te.score.toFixed(2) : null;
+    rows.push(`<tr class="notroster"><td>Team Effort<br><small>shared-credit entries, not an individual roster member</small></td>` +
+      `<td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td>` +
+      `${teCoach ? `<td>${teCoach}</td>` : `<td class="pending">no evals this period</td>`}` +
+      `<td class="total">${teCoach ? teCoach + ' / 100' : '&mdash;'}</td></tr>`);
+    tbody.innerHTML = rows.join('');
+
+    const label = {all:'all months (Jul–Sep 2026)', '07':'July 2026', '08':'August 2026', '09':'September 2026'}[month];
+    document.getElementById('rosterNote').innerHTML =
+      `Coaching &amp; Feedback column, ${label} = (facilitator's average rating &divide; 5) &times; 20% weight, ` +
+      `recomputed from pages/coaching-feedback.html's own response data for that period. ` +
+      `<b>Nica Tardio</b> has real Coaching &amp; Feedback data (10 evaluations) but isn't on this table, since she ` +
+      `doesn't appear in the Store Visit Visitor Leaderboard that this roster is now sourced from &mdash; worth checking ` +
+      `whether that's expected (coaching-only role) or a gap in the Store Visit log. Dennis and Jov Palattao also have ` +
+      `Coaching &amp; Feedback data but were never on any of the official rosters found so far; see the facilitator ` +
+      `scorecard for everyone's individual numbers regardless of roster membership.`;
+  }
+
+  document.getElementById('monthSeg').addEventListener('click', e => {
+    const btn = e.target.closest('button[data-m]');
+    if (!btn) return;
+    document.querySelectorAll('#monthSeg button').forEach(b => b.setAttribute('aria-pressed', b === btn ? 'true' : 'false'));
+    renderRoster(btn.dataset.m);
+  });
+  renderRoster('all');
+  </script>
 
   <footer>Source data: Store Visit Evaluation Survey, [sys] STORE VISIT 2026, Training Program &amp; Delivery Monitoring 2026,
     and TDD Team Attendance Monitoring 2026 &mdash; all in the <b>KPI Data sheet (Pilot)</b> Drive folder.</footer>
