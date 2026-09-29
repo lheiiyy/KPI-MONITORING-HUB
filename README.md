@@ -14,7 +14,30 @@ facilitators on:
 
 This repo was split out of [`lheiiyy/TddProjectai`](https://github.com/lheiiyy/TddProjectai)'s
 `KPI_Monitoring_Initiative/` folder (see that repo's PR #10 for history)
-so it can be deployed on its own via Netlify.
+so it can be deployed on its own.
+
+## Hosting & pilot access
+
+Live at **https://lheiiyy.github.io/kpi-monitoring-hub/** via GitHub
+Pages (Settings → Pages → Deploy from branch `main` / root) — no build
+step, no credits/build-minutes, rebuilds automatically on every push.
+
+A Netlify deployment (`netlify/edge-functions/basic-auth.ts`) was tried
+first, with real server-side HTTP Basic Auth gating every page. It's
+kept in the repo but unused, since that Netlify team's build credits
+were exhausted before it could deploy.
+
+Every page now has a **client-side password prompt** instead (see the
+inline `<script>` at the top of each `<head>`, password
+`FigaroTDD-Pilot2026`). Be clear about what this is and isn't: it's a
+casual deterrent against someone stumbling on the link, not real
+access control — the password and the full page content both ship in
+the page source, so anyone who opens dev tools or disables JavaScript
+can bypass it. Don't treat this as sufficient protection for the real
+employee names and individual performance ratings in here; if that
+matters, move back to the Netlify (or equivalent) server-side gate
+once credits/budget allow, or make the repo's audience otherwise
+trusted (private distribution of the link only).
 
 ## Pages
 
