@@ -1,0 +1,300 @@
+{
+ "generated_at": "2026-09-29T07:56:12+00:00",
+ "months": [
+  "07",
+  "08",
+  "09"
+ ],
+ "month_labels": {
+  "07": "July 2026",
+  "08": "August 2026",
+  "09": "September 2026"
+ },
+ "weights": {
+  "attendance": 10,
+  "store_visits": 25,
+  "cross_training": 25,
+  "training_delivery": 20,
+  "coaching": 20
+ },
+ "targets_per_month": {
+  "store_visits": 32,
+  "cross_training": 12,
+  "training_delivery": 2,
+  "attendance": 100
+ },
+ "roster": [
+  {
+   "id": "GIO",
+   "name": "Geoffrey Carranceja"
+  },
+  {
+   "id": "ALEX",
+   "name": "Alex Rivera"
+  },
+  {
+   "id": "RICE",
+   "name": "Ricelle (Rice) Lim"
+  },
+  {
+   "id": "JOSH",
+   "name": "Josh Earnshaw"
+  },
+  {
+   "id": "JAMES",
+   "name": "James Nacionales"
+  },
+  {
+   "id": "SKY",
+   "name": "Sky"
+  },
+  {
+   "id": "CHARLIE",
+   "name": "Charlie Moises"
+  },
+  {
+   "id": "LEO",
+   "name": "Leo Fernandez"
+  },
+  {
+   "id": "ANN",
+   "name": "Ann Barredo"
+  },
+  {
+   "id": "YANA",
+   "name": "Alliana (Yana) Papa"
+  },
+  {
+   "id": "VER",
+   "name": "Ver Guerrero"
+  },
+  {
+   "id": "DANIEL",
+   "name": "Daniel De Leon"
+  }
+ ],
+ "store_visits": {
+  "07": {
+   "GIO": 9,
+   "ALEX": 12,
+   "RICE": 5,
+   "JOSH": 4,
+   "JAMES": 20,
+   "SKY": 18,
+   "CHARLIE": 13,
+   "LEO": 24,
+   "ANN": 5,
+   "YANA": 12,
+   "VER": 18,
+   "DANIEL": 6
+  },
+  "08": {
+   "GIO": 8,
+   "ALEX": 12,
+   "RICE": 4,
+   "JOSH": 5,
+   "JAMES": 12,
+   "SKY": 2,
+   "CHARLIE": 29,
+   "LEO": 22,
+   "ANN": 25,
+   "YANA": 10,
+   "VER": 10,
+   "DANIEL": 2
+  },
+  "09": {
+   "GIO": 6,
+   "ALEX": 11,
+   "RICE": 4,
+   "JOSH": 0,
+   "JAMES": 13,
+   "SKY": 2,
+   "CHARLIE": 21,
+   "LEO": 25,
+   "ANN": 26,
+   "YANA": 11,
+   "VER": 24,
+   "DANIEL": 1
+  }
+ },
+ "cross_training": {
+  "roster": {
+   "07": {},
+   "08": {
+    "YANA": 3,
+    "ANN": 4
+   },
+   "09": {
+    "YANA": 2,
+    "VER": 2,
+    "ANN": 5,
+    "RICE": 3
+   }
+  },
+  "off_roster": {
+   "07": {
+    "Nica": 1
+   },
+   "08": {
+    "Unattributed": 1,
+    "Nica": 3
+   },
+   "09": {
+    "Nica": 2
+   }
+  },
+  "failed": {
+   "07": 0,
+   "08": 1,
+   "09": 0
+  }
+ },
+ "coaching": {
+  "all": {
+   "Leo Fernandez": {
+    "n": 34,
+    "score": 19.68
+   },
+   "Ann Barredo": {
+    "n": 16,
+    "score": 18.63
+   },
+   "Ver Guerrero": {
+    "n": 26,
+    "score": 18.85
+   },
+   "James Nacionales": {
+    "n": 7,
+    "score": 17.26
+   },
+   "Alex Rivera": {
+    "n": 60,
+    "score": 19.76
+   },
+   "Alliana (Yana) Papa": {
+    "n": 10,
+    "score": 16.75
+   },
+   "Sky": {
+    "n": 16,
+    "score": 18.73
+   },
+   "Ricelle (Rice) Lim": {
+    "n": 1,
+    "score": 19.73
+   },
+   "Josh Earnshaw": {
+    "n": 7,
+    "score": 20.0
+   },
+   "Daniel De Leon": {
+    "n": 21,
+    "score": 19.82
+   },
+   "Team Effort": {
+    "n": 26,
+    "score": 18.83
+   }
+  },
+  "07": {
+   "Leo Fernandez": {
+    "n": 5,
+    "score": 19.04
+   },
+   "Ann Barredo": {
+    "n": 14,
+    "score": 18.44
+   },
+   "Ver Guerrero": {
+    "n": 6,
+    "score": 19.2
+   },
+   "James Nacionales": {
+    "n": 5,
+    "score": 19.36
+   },
+   "Alliana (Yana) Papa": {
+    "n": 1,
+    "score": 4.0
+   },
+   "Sky": {
+    "n": 14,
+    "score": 18.55
+   },
+   "Daniel De Leon": {
+    "n": 16,
+    "score": 19.77
+   },
+   "Team Effort": {
+    "n": 6,
+    "score": 17.82
+   }
+  },
+  "08": {
+   "Leo Fernandez": {
+    "n": 27,
+    "score": 19.77
+   },
+   "Ver Guerrero": {
+    "n": 10,
+    "score": 19.15
+   },
+   "James Nacionales": {
+    "n": 1,
+    "score": 20.0
+   },
+   "Alex Rivera": {
+    "n": 31,
+    "score": 19.66
+   },
+   "Sky": {
+    "n": 2,
+    "score": 20.0
+   },
+   "Ricelle (Rice) Lim": {
+    "n": 1,
+    "score": 19.73
+   },
+   "Daniel De Leon": {
+    "n": 5,
+    "score": 20.0
+   },
+   "Team Effort": {
+    "n": 20,
+    "score": 19.12
+   }
+  },
+  "09": {
+   "Leo Fernandez": {
+    "n": 2,
+    "score": 20.0
+   },
+   "Ann Barredo": {
+    "n": 2,
+    "score": 20.0
+   },
+   "Ver Guerrero": {
+    "n": 10,
+    "score": 18.35
+   },
+   "James Nacionales": {
+    "n": 1,
+    "score": 4.0
+   },
+   "Alex Rivera": {
+    "n": 29,
+    "score": 19.87
+   },
+   "Alliana (Yana) Papa": {
+    "n": 9,
+    "score": 18.16
+   },
+   "Josh Earnshaw": {
+    "n": 7,
+    "score": 20.0
+   }
+  }
+ },
+ "attendance": null,
+ "training_delivery": null
+}

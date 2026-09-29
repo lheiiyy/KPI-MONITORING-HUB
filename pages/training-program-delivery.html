@@ -50,12 +50,7 @@ dd{margin:0}
     <p class="sub">Number of training programs conducted or rolled out by the facilitator.</p>
   </header>
 
-  <section class="kpis" aria-label="Summary">
-    <div class="kpi"><div class="lbl">Actual score</div><div class="val">0.50</div></div>
-    <div class="kpi"><div class="lbl">Rating</div><div class="val">50.00%</div></div>
-    <div class="kpi"><div class="lbl">Weighted score</div><div class="val">10.00</div></div>
-    <div class="kpi"><div class="lbl">Weight</div><div class="val">20%</div></div>
-  </section>
+  <div id="kraMount"></div>
 
   <section class="panel">
     <h2>How this KRA is scored</h2>
@@ -74,16 +69,7 @@ dd{margin:0}
     <p><a href="https://docs.google.com/spreadsheets/d/1mp4-6KHcX5iDB5Oto1Smjfyq-xW4KAZCC8CA09hhpB4/edit" target="_blank" rel="noopener">Open the training program log &rarr;</a></p>
   </section>
 
-  <section class="panel notes">
-    <h2>Facilitator roster</h2>
-    <p>The same 12-member Training Department roster used on every KRA page (see the
-      <a href="../index.html">landing page's cross-KRA table</a>). No sessions are logged yet in Training Program
-      &amp; Delivery Monitoring 2026, so per-person delivery counts will appear here once real entries land there.</p>
-    <div class="roster">
-      <span>Alex Rivera</span><span>Alliana (Yana) Papa</span><span>Ann Barredo</span><span>Charlie Moises</span>
-      <span>Daniel De Leon</span><span>Geoffrey Carranceja</span><span>James Nacionales</span><span>Josh Earnshaw</span>
-      <span>Leo Fernandez</span><span>Nica Tardio</span><span>Ricelle (Rice) Lim</span><span>Ver Guerrero</span>
-    </div>
-  </section>
 </div>
+<script src="../js/kpi.js"></script>
+<script>KPI.mountKra(document.getElementById("kraMount"),"training_delivery");</script>
 </body></html>

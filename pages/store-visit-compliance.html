@@ -51,12 +51,7 @@ dd{margin:0}
       brands and stores.</p>
   </header>
 
-  <section class="kpis" aria-label="Summary">
-    <div class="kpi"><div class="lbl">Actual score</div><div class="val">0.72</div></div>
-    <div class="kpi"><div class="lbl">Rating</div><div class="val">71.88%</div></div>
-    <div class="kpi"><div class="lbl">Weighted score</div><div class="val">17.97</div></div>
-    <div class="kpi"><div class="lbl">Weight</div><div class="val">25%</div></div>
-  </section>
+  <div id="kraMount"></div>
 
   <section class="panel">
     <h2>How this KRA is scored</h2>
@@ -74,17 +69,7 @@ dd{margin:0}
       records.</p>
   </section>
 
-  <section class="panel notes">
-    <h2>Facilitator roster</h2>
-    <p>The same 12-member Training Department roster used on every KRA page (see the
-      <a href="../index.html">landing page's cross-KRA table</a>). Per-person visit compliance isn't broken out here
-      by design &mdash; that breakdown lives in SVMI_Project's own reporting layer against [sys] STORE VISIT 2026,
-      not duplicated in this static page.</p>
-    <div class="roster">
-      <span>Alex Rivera</span><span>Alliana (Yana) Papa</span><span>Ann Barredo</span><span>Charlie Moises</span>
-      <span>Daniel De Leon</span><span>Geoffrey Carranceja</span><span>James Nacionales</span><span>Josh Earnshaw</span>
-      <span>Leo Fernandez</span><span>Nica Tardio</span><span>Ricelle (Rice) Lim</span><span>Ver Guerrero</span>
-    </div>
-  </section>
 </div>
+<script src="../js/kpi.js"></script>
+<script>KPI.mountKra(document.getElementById("kraMount"),"store_visits");</script>
 </body></html>

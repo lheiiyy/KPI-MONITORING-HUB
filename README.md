@@ -109,3 +109,15 @@ Sheets-API) backend that reads all five sources and recomputes the KRA
 numbers on `index.html` and each `pages/*.html` automatically, plus a
 test suite — sharing the survey-parsing/name-matching logic with
 SVMI_Project's existing `SVMKPI_*` scripts rather than duplicating it.
+
+## Monthly KPI view (snapshot)
+
+Every KRA page except Coaching & Feedback (which has its own month filter) and the
+landing-page roster share `js/kpi.js`, which reads `data/kpi-monthly.json`.
+Roster = CONFIG_VISITORS in `[sys] STORE VISIT 2026`. Targets per month: store
+visits 32, cross-training 12. Attendance and Training Program Delivery have no
+logged rows yet, so they show "no data". This is a snapshot, not live. Refresh with:
+
+    python3 scripts/build_kpi_monthly.py --kpi-tab kpi2026.csv --cross cross.csv > data/kpi-monthly.json
+
+(`kpi2026.csv` = visitor rows of the KPI 2026 tab; `cross.csv` = the native cross-training sheet.)
