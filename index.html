@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KPI Monitoring Initiative</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#f5f6f8; --surface:#ffffff; --ink:#141820; --ink-2:#4b5361; --muted:#7a8392;
+  --line:#e2e5ea; --line-2:#cdd2da; --accent:#1c56b8; --accent-soft:#e8effa;
+  --good:#0a7d0a; --good-bg:#e5f4e5;
+  --display:"Schibsted Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1116; --surface:#161a21; --ink:#f1f3f6; --ink-2:#b8bfcb; --muted:#8a93a2;
+  --line:#272d37; --line-2:#363d49; --accent:#7fa9f0; --accent-soft:#1c2740;
+  --good:#3fc33f; --good-bg:#15291a;
+  color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 var(--body)}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:20px;padding-block:32px 56px;display:grid;gap:26px}
+.eyebrow{font:500 11.5px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font:800 clamp(28px,4vw,38px)/1.1 var(--display);letter-spacing:-.01em;margin:8px 0 6px}
+.sub{color:var(--ink-2);margin:0;max-width:75ch}
+.sub b{color:var(--ink);font-weight:600}
+.total{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-top:6px}
+.total .lbl{font:500 11px/1.2 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.total .val{font:700 32px/1 var(--display);color:var(--good)}
+.total .note{color:var(--ink-2);font-size:12.5px;max-width:60ch}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+a.card{display:grid;gap:10px;align-content:start;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;text-decoration:none;color:inherit;transition:border-color .12s,transform .12s}
+a.card:hover{border-color:var(--accent);transform:translateY(-2px)}
+a.card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.card .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.card h2{font:700 18px/1.25 var(--display);margin:0}
+.weight{flex:none;font:600 11px/1 var(--body);color:var(--accent);background:var(--accent-soft);padding:5px 9px;border-radius:999px;letter-spacing:.02em}
+.card p{margin:0;color:var(--ink-2);font-size:13px}
+.card .formula{font:500 11px var(--mono);color:var(--muted)}
+.card .go{margin-top:4px;font:600 12.5px var(--body);color:var(--accent)}
+footer{color:var(--muted);font-size:12px;border-top:1px solid var(--line);padding-top:14px}
+</style>
+</head><body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Training &amp; Development Division · HRAD · Figaro Culinary Group</div>
+    <h1>KPI Monitoring Initiative</h1>
+    <p class="sub">A facilitator KRA scorecard rolled up from five monitoring sources. Pick a KRA below to open its
+      monitoring page &mdash; each one shows the executive summary; the underlying logs live in the
+      <b>KPI Data sheet (Pilot)</b> Google Drive folder.</p>
+  </header>
+
+  <div class="total">
+    <span class="lbl">Illustrative total KRA score</span>
+    <span class="val">63.42%</span>
+    <span class="note">Attendance 10.00 + Store Visit Compliance 17.97 + Staff Proficiency 6.25 + Training Program Delivery 10.00 +
+      Coaching &amp; Feedback 19.20 (department-wide average, Jul&ndash;Sep 2026). Swap in one facilitator's own numbers for their
+      individual scorecard.</span>
+  </div>
+
+  <section class="cards" aria-label="KRA monitoring pages">
+    <a class="card" href="pages/attendance.html">
+      <div class="top"><h2>Attendance / Punctuality / Behavior</h2><span class="weight">10%</span></div>
+      <p>Attendance record, tardiness, and adherence to conduct standards.</p>
+      <div class="formula">(Days Present &minus; Lates &minus; Absences) / Total Working Days &times; 100%</div>
+      <div class="go">Open executive summary &rarr;</div>
+    </a>
+    <a class="card" href="pages/store-visit-compliance.html">
+      <div class="top"><h2>Store Visit Compliance</h2><span class="weight">25%</span></div>
+      <p>Actual store visits vs. required visits.</p>
+      <div class="formula">Actual Store Visits / Target Store Visits &times; 100%</div>
+      <div class="go">Open executive summary &rarr;</div>
+    </a>
+    <a class="card" href="pages/staff-proficiency.html">
+      <div class="top"><h2>Staff Proficiency / Cross-Training</h2><span class="weight">25%</span></div>
+      <p>Staff certified on other stations during store visits.</p>
+      <div class="formula">Staff Certified / Staff Scheduled for Certification &times; 100%</div>
+      <div class="go">Open executive summary &rarr;</div>
+    </a>
+    <a class="card" href="pages/training-program-delivery.html">
+      <div class="top"><h2>Training Program Delivery</h2><span class="weight">20%</span></div>
+      <p>Number of training programs conducted/rolled out.</p>
+      <div class="formula">Programs Delivered / Programs Required &times; 100%</div>
+      <div class="go">Open summary &amp; data sheet &rarr;</div>
+    </a>
+    <a class="card" href="pages/coaching-feedback.html">
+      <div class="top"><h2>Coaching &amp; Feedback</h2><span class="weight">20%</span></div>
+      <p>Store manager / participant satisfaction rating on the trainor's visit.</p>
+      <div class="formula">Average Survey Score / Maximum Possible Score &times; 100%</div>
+      <div class="go">Open facilitator scorecard &rarr;</div>
+    </a>
+  </section>
+
+  <footer>Source data: Store Visit Evaluation Survey, [sys] STORE VISIT 2026, Training Program &amp; Delivery Monitoring 2026,
+    and TDD Team Attendance Monitoring 2026 &mdash; all in the <b>KPI Data sheet (Pilot)</b> Drive folder.</footer>
+</div>
+</body></html>

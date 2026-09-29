@@ -1,0 +1,654 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Facilitator KPI Scorecard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: operations scorecard — filter bar, KPI strip, ranked scorecard table, then charts and per-facilitator drill-down */
+:root{
+  --bg:#f5f6f8; --surface:#ffffff; --ink:#141820; --ink-2:#4b5361; --muted:#7a8392;
+  --line:#e2e5ea; --line-2:#cdd2da; --accent:#1c56b8; --accent-soft:#e8effa;
+  --series:#2a78d6; --team:#eb6834; --grid:#eceef2;
+  --good:#0a7d0a; --good-bg:#e5f4e5; --warn:#8a5a00; --warn-bg:#fdf1d6; --crit:#b42f2f; --crit-bg:#fbe7e7; --vg:#1c56b8; --vg-bg:#e8effa;
+  --display:"Schibsted Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1116; --surface:#161a21; --ink:#f1f3f6; --ink-2:#b8bfcb; --muted:#8a93a2;
+  --line:#272d37; --line-2:#363d49; --accent:#7fa9f0; --accent-soft:#1c2740;
+  --series:#3987e5; --team:#d95926; --grid:#222831;
+  --good:#3fc33f; --good-bg:#15291a; --warn:#f2b73a; --warn-bg:#2d2511; --crit:#f07575; --crit-bg:#331a1c; --vg:#8db4f5; --vg-bg:#1c2740;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1116; --surface:#161a21; --ink:#f1f3f6; --ink-2:#b8bfcb; --muted:#8a93a2;
+  --line:#272d37; --line-2:#363d49; --accent:#7fa9f0; --accent-soft:#1c2740;
+  --series:#3987e5; --team:#d95926; --grid:#222831;
+  --good:#3fc33f; --good-bg:#15291a; --warn:#f2b73a; --warn-bg:#2d2511; --crit:#f07575; --crit-bg:#331a1c; --vg:#8db4f5; --vg-bg:#1c2740;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:14px/1.5 var(--body)}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:20px;padding-block:28px 56px;display:grid;gap:22px}
+header{display:grid;gap:6px}
+.eyebrow{font:500 11.5px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font:800 clamp(26px,4vw,36px)/1.1 var(--display);letter-spacing:-.01em;margin:0;text-wrap:balance}
+h2{font:700 17px/1.25 var(--display);margin:0}
+.sub{color:var(--ink-2);margin:0;max-width:75ch}
+.sub b{color:var(--ink);font-weight:600}
+.bar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.seg{display:inline-flex;border:1px solid var(--line-2);border-radius:8px;overflow:hidden}
+.seg button{font:500 13px var(--body);border:0;background:transparent;color:var(--ink-2);padding:6px 12px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line-2)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff}
+:root[data-theme="dark"] .seg button[aria-pressed="true"]{color:#0e1116}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .seg button[aria-pressed="true"]{color:#0e1116}}
+label.ctl{display:inline-flex;align-items:center;gap:8px;color:var(--ink-2);font-size:13px}
+select{font:500 13px var(--body);color:var(--ink);background:var(--surface);border:1px solid var(--line-2);border-radius:8px;padding:6px 8px}
+input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px}
+button:focus-visible,select:focus-visible,input:focus-visible,tr:focus-visible,th button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.spacer{flex:1}
+.fnote{font-size:12px;color:var(--muted)}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:grid;gap:4px;align-content:start}
+.kpi .lbl{font:500 11px/1.2 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.kpi .val{font:700 28px/1.1 var(--display)}
+.kpi .val small{font:500 14px var(--body);color:var(--muted)}
+.kpi .hint{font-size:12.5px;color:var(--ink-2)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:grid;gap:14px;min-width:0}
+.phead{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;justify-content:space-between}
+.phead p{margin:0;color:var(--muted);font-size:12.5px}
+.tscroll{overflow-x:auto;margin-inline:-4px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:9px 8px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+th{font:500 11px/1.2 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);vertical-align:bottom}
+th button{all:unset;cursor:pointer;display:inline-flex;gap:4px;align-items:center}
+th button[data-dir]::after{content:attr(data-dir);color:var(--accent)}
+th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}
+td{font-variant-numeric:tabular-nums}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:var(--accent-soft)}
+tbody tr[aria-selected="true"]{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
+tr.team td{border-top:2px solid var(--line-2)}
+.rank{color:var(--muted);font-family:var(--mono);font-size:12px;width:28px}
+.name{font-weight:600}
+.name .sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:8px;vertical-align:1px}
+.name small{display:block;font-weight:400;color:var(--muted);font-size:11.5px}
+.dim{color:var(--muted)}
+.pill{display:inline-block;font:600 11px/1 var(--body);padding:4px 8px;border-radius:999px;letter-spacing:.02em}
+.b-ex{color:var(--good);background:var(--good-bg)} .b-vg{color:var(--vg);background:var(--vg-bg)} .b-gd{color:var(--warn);background:var(--warn-bg)} .b-lo{color:var(--crit);background:var(--crit-bg)}
+.flag{color:var(--crit);font-weight:600}
+.lowsample{font:500 10.5px var(--mono);color:var(--warn);background:var(--warn-bg);border-radius:4px;padding:1px 5px;margin-left:6px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:900px){.grid2{grid-template-columns:1fr}}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink-2)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.legend i.ring{border-radius:50%;background:transparent!important;border:2px solid var(--muted)}
+svg text{font-family:var(--body)}
+.chart{width:100%;display:block}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12px;padding:7px 9px;border-radius:6px;max-width:260px;z-index:10;line-height:1.35;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.tip b{font-weight:600}
+.heat td{text-align:center;font-weight:500}
+.heat td:first-child{text-align:left;font-weight:600}
+.detail{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px}
+@media (max-width:900px){.detail{grid-template-columns:1fr}}
+.stats{display:flex;flex-wrap:wrap;gap:8px}
+.stat{border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12.5px;color:var(--ink-2)}
+.stat b{color:var(--ink);font:600 15px var(--display);margin-right:4px}
+.list{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.list li{display:flex;justify-content:space-between;gap:10px;font-size:13px;border-bottom:1px dashed var(--line);padding-bottom:5px}
+.list li span:last-child{font-variant-numeric:tabular-nums;color:var(--ink-2)}
+h3{font:600 12px/1.2 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:4px 0 8px}
+.quotes{display:grid;gap:8px;max-height:340px;overflow:auto;padding-right:4px}
+.q{border-left:2px solid var(--line-2);padding:2px 0 2px 10px;font-size:13px}
+.q small{display:block;color:var(--muted);font-size:11.5px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;border:1px solid var(--line-2);border-radius:999px;padding:2px 9px;color:var(--ink-2)}
+.notes{font-size:13px;color:var(--ink-2);display:grid;gap:6px}
+.notes p{margin:0;max-width:95ch}
+.notes b{color:var(--ink)}
+.empty{color:var(--muted);font-size:13px}
+.sync{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-2)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex:none}
+.dot.live{background:var(--good)} .dot.warn{background:var(--warn)} .dot.busy{background:var(--accent);animation:pulse 1s infinite alternate}
+@keyframes pulse{to{opacity:.3}}
+@media (prefers-reduced-motion:reduce){.dot.busy{animation:none}}
+.btn{font:500 13px var(--body);color:var(--ink);background:var(--surface);border:1px solid var(--line-2);border-radius:8px;padding:6px 12px;cursor:pointer}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn[disabled]{opacity:.5;cursor:default}
+.syncmsg{font-size:12.5px;color:var(--warn);background:var(--warn-bg);border-radius:8px;padding:8px 12px;margin:0}
+@media (prefers-reduced-motion:no-preference){tbody tr{transition:background .12s}}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Training &amp; Development Division · HRAD · Figaro Culinary Group</div>
+  <h1>Facilitator KPI Scorecard</h1>
+  <p class="sub">Based on the <b>Store Visit Evaluation Survey</b> responses, <b id="periodLbl"></b>. Rated on the survey's 5-point scale (5 Excellent · 4 Very Good · 3 Good · 2 Fair · 1 Poor). Responses that name no specific facilitator are credited to <b>Team Effort</b>.</p>
+</header>
+
+<div class="bar" role="group" aria-label="Filters">
+  <div class="seg" id="monthSeg" role="group" aria-label="Month"></div>
+  <label class="ctl" for="brandSel">Brand
+    <select id="brandSel"><option value="all">All brands</option></select>
+  </label>
+  <label class="ctl" for="exclRev"><input type="checkbox" id="exclRev"> Exclude likely scale misreads <span class="fnote" id="revCount"></span></label>
+  <span class="spacer"></span>
+  <span class="fnote" id="filterNote"></span>
+  <span class="sync" id="sync" aria-live="polite"><span class="dot" id="syncDot"></span><span id="syncTxt">Saved snapshot</span></span>
+  <button type="button" class="btn" id="refreshBtn">Refresh from Drive</button>
+</div>
+<p class="syncmsg" id="syncMsg" hidden></p>
+
+<section class="kpis" id="kpis" aria-label="Summary"></section>
+
+<section class="panel">
+  <div class="phead"><h2>Facilitator scorecard</h2><p>Click a column to sort · click a row to open the facilitator's profile below <button type="button" class="btn" id="expBtn" hidden style="margin-left:8px">Export CSV</button></p></div>
+  <div class="tscroll"><table id="score"><thead></thead><tbody></tbody></table></div>
+  <div class="legend">
+    <span><span class="pill b-ex">Excellent</span> 4.50–5.00</span>
+    <span><span class="pill b-vg">Very Good</span> 4.00–4.49</span>
+    <span><span class="pill b-gd">Good</span> 3.00–3.99</span>
+    <span><span class="pill b-lo">Fair / Poor</span> below 3.00</span>
+    <span><span class="lowsample">LOW n</span> fewer than 5 evaluations</span>
+  </div>
+</section>
+
+<section class="grid2">
+  <div class="panel">
+    <div class="phead"><h2>Evaluations received</h2><p>Responses crediting each facilitator</p></div>
+    <div class="legend"><span><i style="background:var(--series)"></i>Named facilitator</span><span><i style="background:var(--team)"></i>Team Effort</span></div>
+    <svg class="chart" id="cCount" role="img" aria-label="Evaluations received per facilitator"></svg>
+  </div>
+  <div class="panel">
+    <div class="phead"><h2>Average rating</h2><p>Mean of all 15 criteria · dashed line = department average</p></div>
+    <div class="legend"><span><i style="background:var(--series);border-radius:50%"></i>Named facilitator</span><span><i style="background:var(--team);border-radius:50%"></i>Team Effort</span></div>
+    <svg class="chart" id="cAvg" role="img" aria-label="Average rating per facilitator"></svg>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="phead"><h2>Monthly activity</h2><p>Evaluations received per month · darker = more</p></div>
+  <div class="tscroll"><table class="heat" id="heat"></table></div>
+</section>
+
+<section class="panel" id="profile">
+  <div class="phead">
+    <h2 id="pTitle">Facilitator profile</h2>
+    <label class="ctl" for="facSel">Facilitator <select id="facSel"></select></label>
+  </div>
+  <div class="stats" id="pStats"></div>
+  <div class="detail">
+    <div>
+      <h3>Criteria scores vs department average</h3>
+      <div class="legend" style="margin-bottom:6px"><span><i style="background:var(--series);border-radius:50%"></i><span id="pLeg">Selected</span></span><span><i class="ring"></i>Department average</span></div>
+      <svg class="chart" id="cCrit" role="img" aria-label="Criteria scores"></svg>
+    </div>
+    <div style="display:grid;gap:14px;align-content:start;min-width:0">
+      <div><h3>Activities conducted</h3><ul class="list" id="pActs"></ul></div>
+      <div><h3>Worked with</h3><div class="chips" id="pCo"></div></div>
+      <div><h3>Stores represented</h3><div class="chips" id="pStores"></div></div>
+    </div>
+  </div>
+  <div class="grid2">
+    <div><h3>What participants found most valuable</h3><div class="quotes" id="pVal"></div></div>
+    <div><h3>Suggested improvements &amp; requested topics</h3><div class="quotes" id="pImp"></div></div>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="phead"><h2>Responses to review</h2><p>Average below 3.00 on the 15 criteria</p></div>
+  <div class="tscroll"><table id="lowT"></table></div>
+</section>
+
+<section class="panel notes">
+  <h2>How this report was built</h2>
+  <p><b>Source.</b> Figaro Culinary Group – Store Visit Evaluation Survey Form (RESPONSE), "Form responses 1" tab, <span id="nAll"></span> responses. <span id="srcNote"></span></p>
+  <p><b>Name matching.</b> The Facilitator / Trainer field is free text, so spellings are grouped: "Sir Leo", "Leo Rey Fernandez", "loe", "lea" → Leo Fernandez; "Ver", "Jeliver", "Gerero" → Ver Guerrero; "Nika", "Nina" → Nica Tardio; "Anne", "an" → Ann Barredo; "Deniel", "Deleon" → Daniel De Leon; "Denis", "Denise" → Dennis; "Joshua" → Josh Earnshaw; "Rice" → Ricelle Lim; "Charlie" → Charlie Moises. Sky, Dennis and Jov Palattao are listed as written in the responses. <span id="unmNote"></span></p>
+  <p><b>Team Effort.</b> Entries with no individual name ("Training Department", "Trainer", "Facilitator", "Training Room", "Trainee", "?", "Good", a store or other department name, or unrelated text) are credited to Team Effort.</p>
+  <p><b>Shared sessions.</b> When a response names several facilitators, each one receives full credit for that response. Because of this, facilitator totals add up to more than the number of responses.</p>
+  <p><b>KPIs.</b> Average rating = mean of all 15 items. Delivery = objectives, expertise, organization, questions answered, participation. Content = relevance, practical examples, knowledge gained, operational improvement. Impact = the six learning-impact statements. Satisfaction = share rating 4 or 5 on "Overall, I am satisfied with the activity".</p>
+  <p><b>Data fixes.</b> <span id="fixNote"></span></p>
+  <p><b>Scale misreads.</b> <span id="revNote"></span></p>
+</section>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+// ---- Survey pipeline: CSV text -> normalized records (shared by snapshot and live Drive data) ----
+const ROSTER = [
+  ["Leo Fernandez",      /\b(leo|loe|lea|leorey|leo ?rey)\b/],
+  ["James Nacionales",   /\b(james?|nacionales)\b/],
+  ["Alex Rivera",        /\b(alex|alexander)\b/],
+  ["Ver Guerrero",       /\b(ver|jeliver|guerr?er+o|gerero)\b/],
+  ["Nica Tardio",        /\b(nica|nika|nina|tardio)\b/],
+  ["Ann Barredo",        /\b(ann|anne|an|barredo)\b/],
+  ["Sky",                /\bsky\b/],
+  ["Daniel De Leon",     /\b(daniel|deniel|deleon)\b/],
+  ["Alliana (Yana) Papa",/\b(yana|alliana)\b/],
+  ["Josh Earnshaw",      /\b(josh|joshua|earnshaw)\b/],
+  ["Ricelle (Rice) Lim", /\b(rice|ricelle)\b/],
+  ["Charlie Moises",     /\b(charlie|moises)\b/],
+  ["Geoffrey Carranceja",/\b(geoffrey|geoff|carranceja)\b/],
+  ["Dennis",             /\b(denis|dennis|denise)\b/],
+  ["Jov Palattao",       /\b(jov|palattao)\b/],
+];
+const TDD = new Set(["Leo Fernandez","James Nacionales","Alex Rivera","Ver Guerrero","Nica Tardio","Ann Barredo","Daniel De Leon","Alliana (Yana) Papa","Josh Earnshaw","Ricelle (Rice) Lim","Charlie Moises","Geoffrey Carranceja"]);
+const HONORIFIC = /\b(sir|ser|ma'?am|maam|mam|ms|mr|mrs|miss|coach)\b\.?/g;
+const GENERIC = /(training|trainer|trainee|facilitator|dept|department|room|commissary|comissary|\bmis\b|\bhr\b|^\W*$|^good$|^n\/?a$|^none$)/;
+const CATS = [
+  ["Rider Refresher & Mobile App", /rider|raider|mobile|batch 6|\bb6\b|bath 6|refreshner|refersher/],
+  ["Professional Image Enhancement", /image|profession/],
+  ["TM Service Steps Training", /service st|service tr|tm service|tien/],
+  ["Orientation", /orr?ientation/],
+  ["Barista & Coffee Bar Training", /barista|coffee|equipment/],
+  ["Customer Service Refresher", /customer service/],
+  ["Technical Validation & Evaluation", /validation|evaluation|exam|august 4/],
+  ["Store Visit", /store|visit|visir/],
+  ["Refresher / Coaching / Corrective Action", /refresh|re fresher|coaching|corrective/],
+  ["Food Safety", /food safety/],
+  ["Training Documentation Notice", /documentation/],
+];
+const clean = s => String(s == null ? "" : s).replace(/\s+/g, " ").trim();
+const titleCase = s => s.toLowerCase().replace(/\b[a-z]/g, c => c.toUpperCase());
+
+function parseCSV(text) {
+  const rows = []; let row = [], f = "", q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) {
+      if (c === '"') { if (text[i + 1] === '"') { f += '"'; i++; } else q = false; }
+      else f += c;
+    } else if (c === '"') q = true;
+    else if (c === ",") { row.push(f); f = ""; }
+    else if (c === "\n" || c === "\r") {
+      if (c === "\r" && text[i + 1] === "\n") i++;
+      row.push(f); rows.push(row); row = []; f = "";
+    } else f += c;
+  }
+  if (f !== "" || row.length) { row.push(f); rows.push(row); }
+  return rows.filter(r => r.some(v => v.trim() !== ""));
+}
+function parseDMY(s) {
+  const m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(clean(s));
+  if (!m) return null;
+  const d = new Date(Date.UTC(+m[3], +m[2] - 1, +m[1]));
+  return isNaN(d) ? null : d;
+}
+const iso = d => d.toISOString().slice(0, 10);
+
+function matchFacilitators(raw, store) {
+  const t = clean(raw).toLowerCase().replace(/[’‘]/g, "'");
+  const hits = ROSTER.filter(([, re]) => re.test(t)).map(([n]) => n);
+  if (hits.length) return { fac: hits, unmatched: null };
+  const bare = t.replace(HONORIFIC, " ").replace(/[^a-z0-9?/&,' ]/g, " ").replace(/\s+/g, " ").trim();
+  const isStore = store && (bare === store.toLowerCase() || /^ap\b/.test(bare));
+  if (!bare || GENERIC.test(bare) || /^\?+$/.test(bare) || isStore || bare.length > 40) return { fac: [], unmatched: null };
+  // An individual name that is not on the list yet: keep it as written
+  const names = [...new Set(bare.split(/\s*(?:\/|&|,|\band\b|\bat\b)\s*/).map(x => x.trim())
+    .filter(x => x && !GENERIC.test(x) && x.split(" ").length <= 3).map(titleCase))];
+  return names.length ? { fac: names, unmatched: names } : { fac: [], unmatched: null };
+}
+
+function processCSV(text) {
+  const rows = parseCSV(text);
+  const hdr = rows[0].map(h => clean(h.split("\n")[0]));
+  const col = p => hdr.findIndex(h => h.toLowerCase().startsWith(p.toLowerCase()));
+  const C = { ts: col("Timestamp"), pos: col("Position"), brand: col("Brand"), date: col("Date"), store: col("AP Store"),
+    act: col("Activity Conducted"), fac: col("Facilitator"),
+    extra: ["APX Store", "FG Store", "TM Store", "KK Store"].map(col).filter(i => i >= 0) };
+  const r0 = C.fac + 1;
+  const items = hdr.slice(r0, r0 + 15);
+  const recs = [], fixes = { dates: [], acts: 0, unmatched: {} };
+  for (const r of rows.slice(1)) {
+    const s = r.slice(r0, r0 + 15).map(v => parseInt(v, 10));
+    if (s.length < 15 || s.some(v => !(v >= 1 && v <= 5))) continue;
+    const ts = parseDMY(r[C.ts]);
+    let d = parseDMY(r[C.date]);
+    if (ts && (!d || d > ts || (ts - d) / 864e5 > 20)) { if (clean(r[C.date])) fixes.dates.push(clean(r[C.date])); d = ts; }
+    if (!d) continue;
+    const store = clean([r[C.store], ...C.extra.map(i => r[i])].find(v => clean(v)) || "").toUpperCase();
+    const m = matchFacilitators(r[C.fac], store);
+    if (m.unmatched) for (const u of m.unmatched) fixes.unmatched[u] = (fixes.unmatched[u] || 0) + 1;
+    const act = clean(r[C.act]);
+    const cat = (CATS.find(([, re]) => re.test(act.toLowerCase())) || ["Unspecified"])[0];
+    recs.push({ date: iso(d), brand: clean(r[C.brand]), store, pos: titleCase(clean(r[C.pos])), cat, fac: m.fac, s,
+      val: clean(r[r0 + 15]), imp: clean(r[r0 + 16]), top: clean(r[r0 + 17]) });
+  }
+  // Blank or unclear activity: take the activity recorded the same day at the same store or by the same facilitator
+  for (const r of recs) {
+    if (r.cat !== "Unspecified") continue;
+    const cnt = {};
+    for (const x of recs) if (x.date === r.date && x.cat !== "Unspecified" &&
+      (x.store === r.store || x.fac.some(f => r.fac.includes(f)) || !r.fac.length)) cnt[x.cat] = (cnt[x.cat] || 0) + 1;
+    const best = Object.entries(cnt).sort((a, b) => b[1] - a[1])[0];
+    if (best) { r.cat = best[0]; fixes.acts++; }
+  }
+  return { items, recs, fixes };
+}
+
+
+const SNAPSHOT_CSV = "Timestamp,Name,Position,Brand,Date,AP Store,Activity Conducted,Facilitator / Trainer,\"Objectives were clearly communicated\nMalinaw na naipaliwanag ang mga layunin ng pagsasanay.\",\"Content was relevant to my job\nAng nilalaman ng pagsasanay ay may kaugnayan sa aking trabaho.\",\"Facilitator demonstrated expertise\nNaipakita ng Trainer ang kanyang kahusayan at sapat na kaalaman.\",\"Activity was organized and easy to understand\nMaayos ang pagkakaayos ng mga aktibidad at madali itong maunawaan.\",\"Examples and coaching were practical\nAng mga halimbawa at coaching na ibinigay ay praktikal at madaling mailapat sa aktuwal na trabaho.\",\"Questions were addressed effectively\nAng mga katanungan ay nasagot nang maayos at malinaw.\",\"Activity enhanced my knowledge and skills\nNadagdagan ng aktibidad ang aking kaalaman at kasanayan.\",\"Activity contributes to improved operations\nNakatutulong ang aktibidad sa pagpapabuti ng operasyon.\",\"Facilitator encouraged participation\nHinikayat ng tagapagsanay ang aktibong pakikilahok ng mga kalahok.\",\"Overall, I am satisfied with the activity\nOverall, I am satisfied with the activity\",\"I gained new knowledge and insights.\nNakakuha ako ng bagong kaalaman at mahahalagang pananaw.\",\"I can immediately apply what I learned.\nMagagamit ko kaagad sa aking trabaho ang mga natutunan ko.\",\"The activity addressed actual operational challenges.\nNakatugon ang aktibidad sa mga aktuwal na hamon sa operasyon.\",\"Coaching and feedback were beneficial.\nNaging kapaki-pakinabang ang coaching at feedback na ibinigay.\",\"The activity motivated me to improve performance.\nNabigyan ako ng motibasyon ng aktibidad upang higit pang mapabuti ang aking pagganap sa trabaho.\",\"What aspect of the activity did you find most valuable? \nAling bahagi ng aktibidad ang pinaka-nakapagbigay ng halaga o pinaka-kapaki-pakinabang para sa iyo?\",\"What areas can be improved for future activities? \nAnong mga aspeto ng aktibidad ang maaari pang mapabuti para sa mga susunod na pagsasanay?\",\"What training or development topics would you like the Training & Development Department to conduct in the future?\n\nAnong mga paksa sa pagsasanay o pagpapaunlad ang nais mong isagawa ng Training & Development Department sa mga susunod na programa?\",Column 26,APX Store,FG Store,TM Store,KK Store\n08/07/2026 13:49:30,,Shift Manager,Angel's Pizza,08/07/2026,BALIUAG,Refresher  / Corrective Action /Coaching ,Nica Tardio / Alliana Kristine,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,When they share knowledge and correctives to us,\"None, all they've said is helpful \",None,1,WALTERMART/TRECE,,,\n10/07/2026 13:05:17,,Shift manager,Angel's Pizza,10/07/2026,ANABU,Visit  the store  AP Anabu,Leo Rey fernandez,5,5,5,5,5,5,5,4,5,5,4,4,4,4,4,Always updated,Rox improvement t,Shellife,4,SM TANZA,,,\n15/07/2026 13:47:58,,Cashier,Angel's Pizza,15/07/2026,BALIUAG,Barista refresher,Ver guerrero,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,Latte art ,Bar,Latte art,4,,,,\n15/07/2026 13:51:46,,Service,Angel's Pizza,15/07/2026,BALIUAG,Barista Masterclass Refresher,Ver Guerrero,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,about all procedures and maintenance of coffee machines,nothing,nothing,5,,,,\n15/07/2026 13:56:48,,Barista ,Angel's Pizza,15/07/2026,BALIUAG,Barista 101,Ver  Guerrero,5,5,5,4,5,5,5,5,5,5,5,5,5,5,5,Presentation ,Demonstration,Latte art,5,,,,\n15/07/2026 17:10:39,,Team leader ,Angel's Pizza,15/07/2026,BGC,Coaching/Corrective action,Ma'am sky,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,1 on 1 talking ,Kitchen area,Sop practices / standards ,5,,,,\n15/07/2026 18:38:45,,Food Prep,Angel's Pizza,15/07/2026,TUGUEGARAO,Refresher,Sir Jame and Sir Leo,5,5,5,5,5,5,5,5,5,5,5,5,5,4,5,About the ROX ,Kitchen ,About the expiration of the product,5,,,,\n15/07/2026 19:16:39,,Service,Angel's Pizza,15/07/2026,TUGUEGARAO,Re fresher,Sir James and Sir leo,5,5,4,5,4,5,5,5,5,5,5,5,4,3,5,N/A,Dine in,N/A,5,,,,\n15/07/2026 19:17:33,,TEAM LEADER,Angel's Pizza,15/07/2026,TUGUEGARAO,Refresher,Sir james Sir Leo,5,5,5,5,5,5,5,5,5,4,5,5,4,4,5,Explain about rox,Rox,Good leader,5,,,,\n16/07/2026 17:19:47,,Store manager,Angel's Pizza,16/07/2026,CAUAYAN,Refresher,Sir james,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Proper standard,N/a,Food safety training,5,,,,\n19/07/2026 21:35:09,,rider,Angel's Pizza,19/07/2026,SANTIAGO,?,?,2,1,3,5,3,2,5,5,5,3,3,2,2,2,2,?,?,?,3,,,,\n19/07/2026 21:47:16,,Team leader ,Angel's Pizza,19/07/2026,SANTIAGO,Visitation ,Sir James and Sir Leo ,5,4,5,5,5,5,5,5,5,5,5,5,5,4,4,For improvement ,Backdoor and labelling ,For the improvement of food products and more topics about the standard of labelling ,5,,,,\n19/07/2026 22:00:38,,SERVICE,Angel's Pizza,19/07/2026,SANTIAGO,Training department,Trainer,4,4,4,4,4,3,4,4,4,4,4,4,4,4,4,Value customer,Kitchen,In kitchn,5,,,,\n19/07/2026 22:54:04,,team leader,Angel's Pizza,19/07/2026,SANTIAGO,food safety,Jov dacutan palattao,4,5,5,5,4,4,5,5,5,5,4,5,5,5,4,food safety ,all,food safety ,5,,,,\n23/07/2026 15:21:45,,Management Trainee,Tien Ma's,23/07/2026,,Service Training,Mr Daniel De Leon,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,How we able to provide customer satisfaction,None,How they will able to provide insights and step how to improve,5,,,TIEN MAS SAN FERNANDO,\n23/07/2026 15:22:03,,Service staff,Tien Ma's,23/07/2026,,Tm service steps,Si daniel,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,12 steps ,12 steps kailangab mas aralin pa at maging consistency.,12 steps,5,,,TIEN MAS RETIRO,\n23/07/2026 15:22:27,,Service staff,Tien Ma's,23/07/2026,,TM SERVICE STEP,Daniel ,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Excellent service ,how to handling proper customer ,\"customer service, consistency \",5,,,TIEN MAS ANTIPOLO,\n23/07/2026 15:22:32,,Shift Manager ,Tien Ma's,23/07/2026,,TM Service Steps,Daniel ,5,5,4,4,4,4,4,5,5,4,3,4,4,4,4,Customer Satisfaction (role play),All service steps,Customer complaints,4,,,TIEN MAS ANTIPOLO,\n23/07/2026 15:23:40,,Mt,Tien Ma's,23/07/2026,,TM Service steps,Sir Daniel Deleon,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Service steps,Wala na po,None,5,,,TIEN MAS WM NORTH,\n23/07/2026 15:24:22,,MT,Tien Ma's,23/07/2026,,Service training ,Facilitator ,5,5,5,4,5,4,5,4,5,5,5,5,5,5,5,Lahat,Lahat ,.. ,5,,,TIEN MAS RETIRO,\n23/07/2026 15:27:08,,Cashier,Tien Ma's,23/07/2026,,Service trainee,Sir daniel de leon,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Lahat,More improvement sa serving,More knowledge,5,,,TIEN MAS SAN FERNANDO,\n23/07/2026 15:29:34,,Service,Tien Ma's,23/07/2026,,Tm service step,Deniel,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,To upsell and push all the item,Maipaliwanag naman po ng maayos,Yung pag babago,5,,,TIEN MAS MORIONES,\n23/07/2026 15:30:38,,service staff,Tien Ma's,23/07/2026,,service training ,sir Daniel ,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,lahat po ng natalakay,naipaliwanag po ng maayos Ang lahat. natalakay po Ang mga dapat na matalakay,natalakay pong LAHAT ,5,,,TIEN MAS WM NORTH,\n23/07/2026 15:37:11,,MT,Tien Ma's,23/07/2026,,TM Service steps,Sir Daniel,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Ang pinakamahalagang bahagi para sa akin ay ang mga actual na halimbaw  at mga bagong strategy na itinuro na magagamit ko sa aking pang-araw-araw na trabaho masnadagdagan ang kaalaman.,\"sa tingin ko po maayos at organisado ang buong aktibidad, wala akong nakikitang kailangang baguhin.\",wala napo,5,,,TIEN MAS SOUTH PARK,\n24/07/2026 15:09:29,,Store Head,Tien Ma's,24/07/2026,,Tienmas Service Step,Sir Daniel,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,lahat po,lahat po ng diniscuss sa training,lahat po,5,,,TIEN MAS SOUTH PARK,\n24/07/2026 15:10:18,,MT,Tien Ma's,24/07/2026,,TM SERVICE STEP,DANIEL DE LEON,5,5,4,5,5,5,5,5,5,5,5,5,4,5,5,Proper sequence of service,None,None,5,,,TIEN MAS ANTIPOLO,\n24/07/2026 15:10:54,,Store head,Tien Ma's,24/07/2026,,TM service step,Sir Daniel,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Role play,More training ,Training about managerial position ,5,,,TIEN MAS MORIONES,\n24/07/2026 15:10:56,,Server,Tien Ma's,24/07/2026,,TM SERVICE STEPS,Sir Daniel,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,The 12 service steps,Focus on the service step,how to handle difficult customers,5,,,TIEN MAS RETIRO,\n24/07/2026 15:13:50,,Service,Tien Ma's,24/07/2026,,TM service step,Sir Daniel/ training department ,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Interact with customers ,12 step ,Check back / suggestive selling ,5,,,TIEN MAS MAKATI,\n24/07/2026 15:14:51,,Service ,Tien Ma's,24/07/2026,,Service trainee,Good,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Suggestions for customer ,Mabuti ,Nothing ,5,,,TIEN MAS SAN FERNANDO,\n24/07/2026 15:15:18,,CASHIER,Tien Ma's,24/07/2026,,Service training,Sir daniel,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Role playing,Role play,Customer service,5,,,TIEN MAS WM NORTH,\n24/07/2026 15:16:38,,AM,Tien Ma's,24/07/2026,,TM Service Steps,Sir Daniel/ training dept. ,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,12 service steps,Activities,Management development. ,5,,,TIEN MAS SAN FERNANDO,\n25/07/2026 13:27:37,,Barista,Figaro,25/07/2026,,Refresher,Ver,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Refresher,Na,Na,5,,SANTA MARIA,,\n25/07/2026 13:39:51,,Cashier,Figaro,25/07/2026,,Refresher (cashier and food prep),Ver Guererro,4,5,4,5,5,5,5,5,5,5,5,5,5,5,5,\"\nAll of the activities\",Bar refresher. Drinks improvement,More refresher,5,,SANTA MARIA,,\n25/07/2026 13:42:00,,Food prep,Figaro,25/07/2026,,Refresher,Ver Guerrero,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Food prep guide,N/a,N/A,5,,SANTA MARIA,,\n30/07/2026 13:18:25,,AREA MANAGER,Angel's Pizza,30/07/2026,METROPLAZA,Professional Image Enhancement,Sky and Anne,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,All,Improvement confident and professionalism,Work Ethic,5,,,,\n30/07/2026 13:18:37,,Customer Service Representative,Angel's Pizza,30/07/2026,SAN PABLO,Professional Image Enhancement,Ma’am Ann/ Ma’am sky,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,The whole seminar,more fun activities ,\"How to handle customers, store problems, etc.\",5,,,,\n30/07/2026 13:18:40,,Manager,Angel's Pizza,30/07/2026,SAN PABLO,Professional Image Enhancement,Maam Ann and Maam Nica,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Work Ethic ,N A,More of connected to this topic for front-of-the-house,5,,,,\n30/07/2026 13:20:06,,Cashier,Angel's Pizza,30/07/2026,LOS BANOS,Professional Image Enhancement ,Trainer,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Ang pagiging behavior,Gawing tama at maayos ang tinuturo ,Mas ma enhance pa ang behavior ng bawat isa,5,,,,\n30/07/2026 13:21:07,,Service,Angel's Pizza,30/07/2026,BEL AIR LAGUNA,professional Image Enhancement,Ann/Nica,5,5,5,5,5,3,5,5,5,5,5,5,5,5,5,Being professional on work,customer Service,Audit Deviations,5,,,,\n30/07/2026 13:21:17,,Cashier,Angel's Pizza,30/07/2026,NOVALICHES,Professional image enhancement,Maam sky ,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Communicate,Na,Na,5,,,,\n30/07/2026 13:22:01,,Pizza maker,Angel's Pizza,30/07/2026,BERKELEY,Professional image enhancement,Maam Sky,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Cguro po ung sa work ethic,Wala nmn po need i improved kasi maayos nmn po lahat,Ok nm po lahat,5,,,,\n30/07/2026 13:22:50,,Shift manager,Angel's Pizza,30/07/2026,NOVALICHES,Professional Image Enhancement,Mam Anne/ Mam Sky ,4,4,5,5,4,4,4,4,4,4,5,4,4,4,4,Ma enhance yung confidence namin as a leader ,Wala naman po ,\"Sa Apc card , kung ganun pa din yung price 299\",4,,,,\n30/07/2026 13:23:02,,MT MANAGER ,Angel's Pizza,30/07/2026,STA.ROSA,Professional image enhancement ,Ma’am Ann and ma’am sky,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,Work ethic ,Hygiene ang physical appearance ,Work ethic and physical appearance ,5,,,,\n30/07/2026 13:23:17,,Cashier,Angel's Pizza,30/07/2026,GUAGUA,Personal Image Enhancement,mam nina&mam ann,5,5,5,5,5,5,5,1,5,5,5,5,5,5,5,\"Body languange Mistakes , Bad Mannerism and Personal Images\",Sa Kitchen Areas po,About Sa Kitchen Area po,5,,,,\n30/07/2026 13:24:02,,MT,Angel's Pizza,30/07/2026,METROPLAZA,Profession and image enhancement,Ma'am sky and ma'am ann,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Importance of profesional image,How to handle irrate customer/ dillusional customer.,N/A,5,,,,\n30/07/2026 13:24:26,,csr,Angel's Pizza,30/07/2026,BERKELEY,professionala image enchancement,maam sky,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,gromming and be professional ,maging maayos sa pananamit at sa maging professional,be pancual  be honest,5,,,,\n30/07/2026 13:24:38,,Shift Manager,Angel's Pizza,30/07/2026,LOS BANOS,Professional Image Enhancement,Mam Ann & Mam Sky,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Physical space,\"Proper communication with your people, boundaries with your staff and time management\",How to be confident with your self,5,,,,\n30/07/2026 13:24:54,,Shift Manager,Angel's Pizza,30/07/2026,GUAGUA,\"An activity conducted report requires a clear summary including the title, date, objectives, and results of the event.\",\" focus on guiding groups, staying neutral, and helping people learn. Key aspects include active listening, managing group conflicts, and checking participant learning.\",5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,\"Para sa akin, ang pinakamahalagang bahagi ng isang aktibidad ay ang paglalapat ng teorya sa praktikal na sitwasyon (hands-on application).Narito ang mga dahilan kung bakit ito ang pinaka-kapaki-pakinabang:Aktibong Pagkatuto: Mas madaling maunawaan ang isang konsepto kapag aktuwal itong ginagawa kaysa binabasa lamang.Pagbuo ng Solusyon: Dito nasusubok ang kritikal na pag-iisip sa pamamagitan ng paglutas sa mga totoong problema.Agarang Feedback: Nakikita agad kung aling bahagi ang nagawa nang tama at alin ang kailangang ayusin.Kumpiyansa: Ang pagtatapos ng isang praktikal na gawain ay nagbibigay ng tiwala sa sarili na kayang ulitin ang proseso sa hinaharap.\",Pamamahala ng Oras (Time Management)Pagsunod sa Iskedyul: Simulan at tapusin ang bawat bahagi sa tamang oras.Sapat na Pahinga: Maglaan ng sapat na break para hindi mapagod ang mga kalahok.Alokasyon ng Oras: Lakihan ang oras sa mga praktikal na pagsasanay kaysa sa lektyur.,\"Narito ang mga mahahalagang paksa sa pagsasanay at pagpapaunlad (Training & Development) na maaaring isagawa para sa mga susunod na programa, na hinati base sa pangangailangan ng organisasyon:1. Kakayahang Pamumuno (Leadership & Management)Strategic Leadership: Paggawa ng mga pangmatagalang desisyon at plano para sa kumpanya.Change Management: Paggabay sa mga empleyado sa panahon ng transisyon o pagbabago sa organisasyon.People Management & Coaching: Tamang pagganyak, pag-evaluate, at pagpapatakbo ng isang koponan.\",5,,,,\n30/07/2026 13:25:04,,MT,Angel's Pizza,30/07/2026,SAN PASCUAL,Professional Image Enhancement ,Mam Ann/Mam Sky,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Work ethic ,Body language mistake,Yung mga mahahalagang bahay na makakatulong sa Amin bilang Isang staff,5,,,,\n30/07/2026 13:25:13,,Shift Manager ,Angel's Pizza,30/07/2026,BEL AIR LAGUNA,Professional Image Enhancement ,Ms. Nica and Ms. Ann,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,The most valuable that I find this training is to be more professional at all the time,None/well explained ,\"Maybe the next training will be the \"\"Pointing of Audit\"\" to discuss all the major deviation  \",5,,,,\n30/07/2026 13:25:24,,Assistant Area Manager,Angel's Pizza,30/07/2026,CAMARIN,Professional Image Enhancement,Maam Sky / Maam Ann,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Learning deeply about work ethic,More engaging activity like we did today ,About Customer complain,5,,,,\n30/07/2026 13:25:33,,Cashier,Angel's Pizza,30/07/2026,CALAMBA,Professional Image Enhancement,Ma'am Sky and Ma'am Anne,5,5,5,5,5,5,5,5,4,5,4,5,4,5,4,Lahat naman po nakakapagbibay samin ng halaga at pakinabang sa araw araw naming trabaho.,\"Proper Grooming, always smile, and maapply lahat ng mga natutunan dito sa Training Seminar Professional Image Enhancement\",\"Wala naman po. Over all ok naman yung discussion, naintindihan din po ng maayos.\",5,,,,\n30/07/2026 13:27:00,,Manager ,Angel's Pizza,30/07/2026,CALAMBA,Professional image enhancement ,Maam sky / maam an,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Lahat ,Lahat,Lahat ,5,,,,\n06/08/2026 14:22:19,,delivery rider,Angel's Pizza,06/08/2026,UN AVE SHELL,batch 6 rider refresher mobile app,sir alex sir denis sir leo,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,ap mobile app,none,pag papadali at pag huhusay sa mga delivery rider,5,,,,\n06/08/2026 14:22:48,,Rider ,Angel's Pizza,06/08/2026,SILANG,Refresh and mobile app,Sir denis and sir alex,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Mga bagong information tungkol sa app ,Wala na,Madami,5,,,,\n06/08/2026 14:23:19,,Rider,Angel's Pizza,06/08/2026,COGEO,Rider refresh and mobile app,Alex rivera & LEO,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,All,None,Very good,5,,,,\n06/08/2026 14:23:22,,Rider,Angel's Pizza,06/08/2026,PASIG,Bacth 6Refresher and mobile app,\"Sir alex,sir dennis sir Leo and MIS\",5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Refresher exam,Mobile app and refresher,Para po sa rider ,5,,,,\n06/08/2026 14:23:44,,pizzamaker/rider,Angel's Pizza,06/08/2026,MCKINLEY,riders refreshir and mobile app,sir alex/ sir leo/sir denis,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,n/a,N/A,N/A,5,,,,\n06/08/2026 14:23:47,,Delivery rider,Angel's Pizza,06/08/2026,ANTIPOLO,Rider refresher,Sir alex at sir dennis,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Rider refresher and mobile apps ,Lubos pa maunahawan ung mobile apps,About sa mobile apps nlang po,5,,,,\n06/08/2026 14:23:50,,Rider,Angel's Pizza,06/08/2026,GENTRI,Refresher and mobile apps,\"Sir alex, sir leo and sir dennis\",5,5,5,5,5,5,5,5,5,5,5,5,5,5,5, Mga bagong information tungkol sa apps .,Wala na,Marami,5,,,,\n06/08/2026 14:24:09,,Rider,Angel's Pizza,06/08/2026,BGC,      Riders  refresher  of mobile app ,Sir/Alex/sir Leo/sir dennis,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,N/A,N/A,N/A,5,,,,\n06/08/2026 14:24:22,,rider,Angel's Pizza,06/08/2026,ORTIGAS,rider refresher/seminar,sir alex/sir denise,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4,customer service,none,none,4,,,,\n06/08/2026 14:24:26,,RIDER,Angel's Pizza,06/08/2026,ALMANZA,BATCH 6 RIDER REFRESHER AND MOBILE APP,Alex & Leo,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Sa part ng discussion of delivery specialist,Discussion,Roleplay of Gtit,5,,,,\n06/08/2026 14:24:31,,Rider,Angel's Pizza,06/08/2026,SAN MATEO,Batch 6 refresher and mobile app,Sir alex and sir leo,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,The new mobile app ,Almost ok naman lahat more power to all ,The new mobile app,5,,,,\n06/08/2026 14:25:02,,Delivery rider,Angel's Pizza,06/08/2026,DASMA,Riders Refresher and mobile app,Sir Alex/ Sir Leo,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Lahat po ng naganap ngayong araw,Mobile app,Mobile app,5,,,,\n06/08/2026 14:25:09,,DTL RIDER,Angel's Pizza,06/08/2026,V MAPA,batch 6 Training Refresher/ app training,Sir alex / sir leo/ sir dennis,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Lahat,Yes,N/A,5,,,,\n06/08/2026 14:25:14,,Delivery rider,Angel's Pizza,06/08/2026,DONA SOLEDAD,Batch 6 refresher and Mobile apps,Sir alex and sir leo,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Ung apps sa phone ,Ung lalabas na apps,Ung bagong apps,5,,,,\n06/08/2026 14:25:15,,rider,Angel's Pizza,06/08/2026,BINONDO,Batch 6 reffresher and mobile app,Sir alex And sir Leo,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Dagdag kaalaman para saking trabaho at mobile app,dagdag.kaalaman sa pag seserbisyo,dagdag kaalaman papo tungkol sa mobile app,5,,,,\n06/08/2026 14:25:32,,delivery rider,Angel's Pizza,06/08/2026,SUCAT,Rider refresher and mobile app,Sir alex,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,demonstrate,trainer,duties and responsibility,5,,,,\n06/08/2026 14:25:39,,Team leader rider ,Angel's Pizza,06/08/2026,TALABA,Bathc 6 Rider Refresher and mobile apps,Sir alex and sir leo,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Rider Refresher ,Mobile apps,N/a,5,,,,\n06/08/2026 14:25:51,,rider,Angel's Pizza,08/06/2026,MONUMENTO,b6 rider refresh & mobile app,\"sir alex , sir leo & sir dennis\",5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,refresher,mobile app,refresher,5,,,,\n06/08/2026 14:25:56,,Rider,Angel's Pizza,06/08/2026,WESTDRIVE,Batch 6 rider refresher and mobile app,\"Sir alex , sir leo \",5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Tamang trato sa kapwa,N/a,N/A,5,,,,\n06/08/2026 14:26:02,,TL rider,Angel's Pizza,06/08/2026,KALAYAAN,Rider refersher rider ap,Alex  loe Dennis ,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Refresher ,Refresher ,Refresher ,5,,,,\n06/08/2026 14:26:16,,Duty teamleader,Angel's Pizza,06/08/2026,BACOOR,Rider refresher and mobile app,Sir alex and sir leo,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,Rider Refreshing ,Rider refresher ,Rider refresher ,4,,,,\n06/08/2026 14:26:37,,Dtl,Angel's Pizza,06/08/2026,PRIMARK,Batch 6 mobile refresher,\"Sir Alex, Sir Leo, \",5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Costumer service,Performing other duties,Give a high performance to the company,5,,,,\n06/08/2026 14:26:44,,Delivery rider,Angel's Pizza,06/08/2026,MALABON,Rider refreshers/ mobilie app,Sir Leo/ Sir Alex/ Sir Dennis,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Good delivery,Speed of delivery,Speed delivery,5,,,,\n06/08/2026 14:27:26,,Rider refresher ,Angel's Pizza,06/08/2026,IMUS,Rider refresher,Sir Alex /sir Leo/sir Dennis ,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Na irefresh,Na irefresh,Konting ayos pa,5,,,,\n06/08/2026 14:27:36,,Rider,Angel's Pizza,06/08/2026,TIMOG,Batch 6 Rider refresher and mobile app,\"Ser Alex, ser Leo and ser denis\",5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Lahat ng paksa,Anything about all positions ,Anything ,5,,,,\n06/08/2026 14:27:44,,Raider,Angel's Pizza,06/08/2026,MAKATI,Bath 6 Refresher Mobile apps,Sir Alex / leo,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,N/a,N/a,N/a,5,,,,\n06/08/2026 14:27:46,,delivery rider,Angel's Pizza,06/08/2026,BINANGONAN,batch 6 rider refresher and mobile app,sir alex and sir leo,5,5,5,4,4,4,4,5,5,5,5,4,4,4,4,we earn points ,improve the things we need,mas mapag tuunan sana yun mga motorbike. ,5,,,,\n06/08/2026 14:27:47,,Rider ,Angel's Pizza,06/08/2026,ANABU,Rider refresher ,Sir Alex sir Leo ,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Na refresh ,Kung paano maayos ung mapadali ,nadagdag ng kaalaman ,5,,,,\n06/08/2026 14:29:31,,Delivery rider ,Angel's Pizza,06/08/2026,HOLY SPIRIT,Batch 6 represeng rider mobile app,Sir Alex & sir lea,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Ung pinaliwanag samen kong papaano gamitin ang mobile app ,Wala po Ako maisip sorry po,Ok nmn po lahat,5,,,,\n06/08/2026 14:29:49,,Dilivery rider ,Angel's Pizza,06/08/2026,SANDOVAL,Batch 6 rider refresher and mobile app ,Sir Alex and sir leo ,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Lahat ng lesson,Wala na masabi,Wala na din po,5,,,,\n06/08/2026 14:36:46,,Delivery Rider ,Angel's Pizza,06/08/2026,SAN SEBASTIAN,Batch 6 refresher and mobile apps,SER ALEX AND SER LEO,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Pag alalabsa mga Gawain ,Ang pagbabahagi ng kaalaman sa katrabaho,Pagpapalawak ng kaalaman patungkol sa mga gawaing makakatulong sa pagpapabilis ng serbisyo ng delivery..,5,,,,\n08/08/2026 12:11:02,,Service Staff,Figaro,08/08/2026,,Validation ,Ver  Guerrero,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Technical examination ,Demonstrate the actual procedure per station ,More Actual procedure ,5,,TACLOBAN,,\n08/08/2026 12:24:07,,Barista,Figaro,08/08/2026,,Validation ,Sir Ver,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,Making coffee,Every area can be improve in the future activities . ,\"For now, i just want to focus in the bar area and making good coffee\",5,,TACLOBAN,,\n08/08/2026 12:30:47,,Store manager,Figaro,05/08/2026,,Technical validation & exam,Ver Gerero,4,4,5,4,4,5,5,4,4,4,4,4,4,4,4,\"The practical hand on tasks,experts guidance and the peer teamwork.\",\"Focus on upgrading  key  operational areas like communication  time management, organization and feedback collection.\",Artificial intelligence and digital tools for daily work stand out as a high value future topic.,4,,TACLOBAN,,\n08/08/2026 13:02:38,,OIC,Figaro,08/08/2026,,August 4 2026,Sir Ver,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Lahat naman po,Lahat po ,Lahat po,5,,TACLOBAN,,\n08/08/2026 13:21:35,,Cashier,Figaro,08/08/2026,,Validation,Ver Guerrero,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,How to deal with customers.,Improve better communication and more organized scheduling,I would like more training communication and teamwork.,5,,TACLOBAN,,\n08/08/2026 13:49:00,,Cashier ,Figaro,08/08/2026,,Evaluation ,Sir ver,5,5,4,4,4,5,5,5,4,5,5,5,4,5,5,Yung standard na Pag operation ,Isa Ulo ang mga tinuturo,More knowledge pa about sa store ,5,,TACLOBAN,,\n09/08/2026 08:22:16,,Food Prep,Figaro,08/08/2026,,Evaluation ,Sir Ver,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,more experiences . ,Sundan ang mga standard upang maging improved and ginawa at naging maayos. ,\"gusto ko ay pag gawa nang sauces, mahirap na nakapag enjoy. \",5,,TACLOBAN,,\n11/08/2026 11:34:59,,stock clerk,Angel's Pizza,11/08/2026,MAYON,training documentation compliance notice,training department ,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,all of it.,\"none, because all of the trainer's executed the training orientation very well.\",all of it.,5,,,,\n11/08/2026 11:37:54,,Cashier ,Angel's Pizza,11/08/2026,BERKELEY,Orientation ,Training Department ,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Code of conduct and proper uniform ,N/A,Importantance of cleanliness ,5,,,,\n11/08/2026 11:39:30,,Warehouse & Logistic Driver,Angel's Pizza,11/08/2026,MAYON,Orientation,Sir James,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Code of conduct,Mga produkto ng kompanya,Wala na,5,,,,\n11/08/2026 11:40:23,,Cashier,Angel's Pizza,11/08/2026,PRIMARK,Orrientation,Training dep.,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Honesty,Explain properly,Dismisal,5,,,,\n11/08/2026 11:41:46,,Production,Angel's Pizza,11/08/2026,MAYON,Orientation,Training Dept,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Malaki ang naitulong ng pagtalakay sa mga totoong sitwasyon upang mas malalim kong maintindihan ang paksa at magamit ko ito sa aking gawain.,Makakatulong din ang pagbibigay ng mas maraming halimbawa at pag-aaral ng mga totoong kaso upang mas madaling maintindihan,\"Magiging kapaki-pakinabang din ang mga paksa tungkol sa wastong asal sa trabaho, at kung paano haharapin ang iba’t ibang sitwasyon sa paggawa.\",5,,,,\n11/08/2026 11:42:47,,Logistic,Angel's Pizza,11/08/2026,MAYON,Orientation,Training department,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Disciplinary action8,Cooperation ,Honesty,5,,,,\n11/08/2026 11:43:12,,Production ,Angel's Pizza,11/08/2026,MAYON,Orientation ,Training Department ,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Lahat po ng aktibidad ay kapaki pakinabang para saakin para matulungan ako sa pagsisimula sa aking bagong trabaho,Para po saakin wala na po dahil nasa maayos na po na nagagawa ito,Lahat po dahil makakatulong po ito sa pag sisimula ng bagong trabaho ,5,,,,\n11/08/2026 11:43:54,,pruduction staff (Tien Ma's),Angel's Pizza,11/08/2026,MAYON,orrientation,training dept,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,\"respeto,anes,\",new skill,maayos na pamamaraan,5,,,,\n11/08/2026 11:44:24,,Production staff,Angel's Pizza,11/08/2026,MAYON,Orientation,Training department,5,5,5,5,5,5,5,5,4,5,5,5,4,5,5,Dishonesty,Sana matoto nang mabuti,Makapag trabaho nang maayos. ,5,,,,\n11/08/2026 12:04:49,,production staff ,Angel's Pizza,11/08/2026,MAYON,orrientation,comissary dept,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,honestmaayos ,kaayusan,maturuan kami ng tama,5,,,,\n11/08/2026 12:12:06,,Production (Tien Ma's) ,Angel's Pizza,11/08/2026,MAYON,Orientation,Training Department,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Dishonesty. Ito po yung napakapagbigay linaw sa akin at nagbigay ng kapaki-pakinabang na aktibidad dahil dito po naipapakita kung gaano kahalaga sa kompanya ang pagiging tapat ng isang empleyado. Sa pamamagitan po ng pagiging tapat ay naipapakita at nakukuha natin ang respeto hindi lang sa kung sino ang kausap natin kundi mula sa kompanyang pinagtatrabahuhan natin. ,Para sa akin po ay wala na. Dahil malinaw po itinalakay ng tagapagturo ang bawat aktibidad sa amin. ,Wala po. Dahil lahat po ng aktibidad na tinalakay sa amin ay makakatulong at magagamit po namin hindi lang po sa trabaho kundi magagamit at makakatulong din sa aming mga sarili. ,5,,,,\n11/08/2026 13:07:10,,Production ,Angel's Pizza,11/08/2026,MAYON,Orientation ,Training Dep.,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Ang pinakamagandang bahagi para sa akin ay ang pagbabahagi ng mga kaalaman at karanasan Ng acting tagapagsalita,Mas maayos po Kong magpapakita Ng mga video at actual na produksyon para mas madali naming masundan ang tamang hakbang sa paggawa,3. Nais ko po sanang magsagawa ang Training Department ng pagsasanay tungkol sa mga tamang hakbang na dapat gawin kapag hindi sinasadyang nalabag ang isang patakaran.,5,,,,\n12/08/2026 15:54:47,,FNB,Figaro,12/08/2026,,Coffee bar training,Sir ver guererro,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Pag timpla ng ibat ibang timplang kape,Pagtimpla ng Cafe latte,Panibagong timplang coffee frappe ,5,,ASSUMPTION,,\n12/08/2026 16:02:58,,Fnb,Figaro,12/08/2026,,Coffee bar training ,Sir ver guerrero ,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,\"Pag hands on sa machine, paano kuhanin ang tamang sukat para makuha ang kalidad ng output/ produkto upang mahikayat lalo ang costumer.\", Gusto ko pang mapabuti ang kaalaman kung paano gumawa ng art or pagdiseniyo sa kape. ,\"Panibagong diskubre, or something thrill / kakaiba sa pandinig at sa panigin. Just to improve the quality and quantity to provide new discover  with the company \",5,,ASSUMPTION,,\n12/08/2026 18:37:12,,FNB,Figaro,12/08/2026,,Coffee making training,Sir. Ver Guerrero,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,How to make coffe,How to make latte art,How to make more coffe,5,,ASSUMPTION,,\n18/08/2026 13:17:47,,Rider,Angel's Pizza,18/08/2026,MALATE,Orientation,Training Department,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Basic Behavioral,Customer service,Customer Service,5,,,,\n18/08/2026 13:30:29,,Production Staff,Angel's Pizza,18/08/2026,MAYON,Orientation,Training Room,5,5,5,5,5,5,5,5,5,5,5,4,5,5,5,\"Ang Rules and Regulations, Code of Conduct\",Wala na dahil natalakay naman ng maayos ang lahat ng mga training mentor at napaliwanag ng maayos. ,Sa akin palagay ay kumpleto na ang programa dahil naipapaliwanag naman ng maayos ng mga training mentor ang mga dapat malaman ng mga traineer about sa Kompanya,5,,,,\n18/08/2026 14:12:39,,Kitchen Staff,Figaro,18/08/2026,,Orientation ,Trainee,4,5,5,5,5,5,5,5,5,4,5,5,5,5,5,Training flow ,\"Company rules regulation, \n\",Barista ,5,,F DASMA,,\n18/08/2026 14:16:06,,Cashier,Angel's Pizza,18/08/2026,PRIMARK,Orientation,Training Department,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Training flow,Company Rules,Food Server,5,,,,\n18/08/2026 14:25:43,,Delivery rider,Angel's Pizza,18/08/2026,MALATE,Orientation,Training department,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Basic behavioral module,Costumer service,Costumer service,5,,,,\n18/08/2026 14:26:25,,Rider,Angel's Pizza,18/08/2026,MAKATI,Orientation,Training department,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Responsibility ang professionalism,Good moral and right conduct ,Act legendary,5,,,,\n18/08/2026 14:26:26,,Production Staff/TM,Angel's Pizza,18/08/2026,MAYON,Orientation,Training Department,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,\"As a trainee, it is the basic behavioral topic. Because it teaches me how to be a good employee, to be obedient to the rules and regulations, to be kind to my co-employee while preparing myself to be a regular employee.\",I think the topics that has nothing to do with my position or department.,The basic behavioral topic which is the most important topic for me.,5,,,,\n18/08/2026 14:26:33,,Rider,Angel's Pizza,18/08/2026,VALENZUELA,Orientation,Training department,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Responsibility and professionalism,Goodmoral,Costumer service,5,,,,\n24/08/2026 22:45:53,,Rider,Angel's Pizza,24/08/2026,KABIHASNAN,Orrientation,Ap kabihasnan,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Lahat ng aktibidad,Lahat,Lahat po ng nattunan,5,,,,\n26/08/2026 14:29:10,,Server/cashier,Tien Ma's,26/08/2026,,Training Service Step,Nica,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Service steps,Kung paano magkaron ng excellent service,Lahat naman po ay maayos.Thank you,5,,,TIEN MAS ANTIPOLO,\n26/08/2026 14:29:21,,Store Manager ,Tien Ma's,26/08/2026,,Service Training ,Daniel and Nica ,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,All the above ,Wala po ,Handling customer feedback and customer satisfaction ,5,,,TIEN MAS ANTIPOLO,\n26/08/2026 14:30:41,,Cashier,Tien Ma's,26/08/2026,,Tien mas Service step,Maam Nika and Sir Daniel,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Service step,Custom service,Customer service,5,,,TIEN MAS MAKATI,\n26/08/2026 14:31:43,,Manager,Tien Ma's,26/08/2026,,Tien ma's service steps,\"Maam sky, sir daniel\",5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,The service steps,Customer service,More knowledgable on hospitality,5,,,TIEN MAS MORIONES,\n26/08/2026 14:33:50,,MANAGER,Tien Ma's,26/08/2026,,TM SERVICE STEPS,daniel de leon /Sky,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,lahat nang na cascade about training lahat ay kapikapinabang,nothing all topics training  has very good report,Nothing All topic is easy to understand  Very good reporting,5,,,TIEN MAS MAKATI,\n26/08/2026 14:34:05,,Service staff,Tien Ma's,26/08/2026,,Service steps training,Ma'am Nica and sir daniel,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Lahat,Role play Materials,None for now,5,,,TIEN MAS SOUTH PARK,\n28/08/2026 15:28:34,,Shift Manager,Angel's Pizza,28/08/2026,SUCAT,Managerial exam,Maam nica/Maam Rice ,4,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Ung exam ,About sa kung panu ihandle. Ang store,Wala. Po,5,,,,\n02/09/2026 16:15:06,,Cashier,Figaro,02/09/2026,,Store visit,(YANA) ALLIANA,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Putting dates and label ,Adaptavility,Barista,5,,ASSUMPTION,,\n02/09/2026 16:15:15,,cashier,Figaro,02/09/2026,,store visir,(YANA) ALLIANA,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,putting label/dates on the item,teamwork ,barista,5,,ASSUMPTION,,\n02/09/2026 16:21:41,,Bar/Cashier,Figaro,02/09/2026,,Store Visit,(YANA) ALLIANA,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Helping with orders,N/A,N/A,5,,MMC,,\n02/09/2026 18:39:54,,Cashier,Figaro,02/09/2026,,Store  Visit,(YANA) ALLIANA,5,5,5,5,5,5,5,5,5,5,5,5,4,5,4,Conducted calibration of espresso machine which help the operation to serve quality coffee,Hands on training for the staff and motivation them to cross-train other station,Cross training for the staff. ,5,,HIGHSTREET,,\n03/09/2026 11:29:47,,Rider,Angel's Pizza,03/09/2026,PALIPARAN,Rider refresher,ALEX,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,N/a,N/a,N/a,5,,,,\n03/09/2026 11:30:32,,RIDER,Angel's Pizza,03/09/2026,FAIRVIEW,RIDER REFRESHER,ALEX,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,gtit,customer service,role play,5,,,,\n03/09/2026 11:30:40,,Rider,Angel's Pizza,03/09/2026,DASMA,Sir alex,ALEX,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Rider refreshment ,Rider activities ,Rider refreshment ,5,,,,\n03/09/2026 11:31:19,,DTL RIDER,Angel's Pizza,03/09/2026,AURORA,RIDER REFRESHER,ALEX,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,GTIT,how to handle custumer,nothing,5,,,,\n03/09/2026 11:31:34,,Rider,Angel's Pizza,03/09/2026,RETIRO,rider refresher ,ALEX,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,n/a,n/a,n/a,5,,,,\n03/09/2026 11:32:01,,Rider,Angel's Pizza,03/09/2026,MONUMENTO,Refreshner,ALEX,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Sa rider delivery po,Rider delivery ,Para mahasa pa po Ang kakayahan po namin,5,,,,\n03/09/2026 11:32:08,,Rider,Angel's Pizza,03/09/2026,DONA SOLEDAD,Rider refresher,ALEX,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,N/A,N/A,N/A,5,,,,\n03/09/2026 11:37:40,,Rider,Angel's Pizza,03/09/2026,COGEO,Rider refresher,ALEX,5,5,5,5,5,5,5,5,5,4,5,4,5,5,5,sobrang malaking bagay po ang aking natutunan sa Descassion para mas lalo pa po lumawak ang aten isip,mas lalo pa po naten mapabuti ang aten trabaho at improved your self,Mas lalo pang maiproprove ung sarili naten sa trabaho and sa customer ,5,,,,\n03/09/2026 11:38:18,,Rider,Angel's Pizza,03/09/0026,SAN MATEO,Rider refresher,ALEX,5,5,5,5,5,5,4,4,4,4,4,4,4,4,4,Kung paano humandle ng costumer,Improve skills,Kung paano mas mapabuti ang operasyon,5,,,,\n03/09/2026 11:40:02,,Rider,Angel's Pizza,03/09/2026,GENTRI,Rider refresher,ALEX,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5, Yung pag refresh sa mga standardize,Yung mga standard,Yung sa gtit,5,,,,\n03/09/2026 11:41:19,,Rider,Angel's Pizza,03/09/2026,ALMANZA,Rider refresher,ALEX,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Exam part,Technology ,Goods and services ,5,,,,\n03/09/2026 11:41:28,,Rider,Angel's Pizza,03/09/2026,UN AVE SHELL,RIDER REFRESH ,ALEX,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Lahat ng na discuss ay mahalaga at mapapakinabangan.,., .,5,,,,\n03/09/2026 11:41:46,,rider,Angel's Pizza,03/09/2026,BACOOR,Rider Refresher,ALEX,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Mas naintindihan mo yung work mo bilang isang rider,Mas pag iigihan pa ang trabaho bilang isang rider for angels pizza,Maayos na pakikinig at programa ,5,,,,\n03/09/2026 11:41:51,,Rider,Angel's Pizza,03/09/2026,ANTIPOLO,Rider refresher,ALEX,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Yes,Delivery aspect,Motorcycle unit,5,,,,\n03/09/2026 11:42:01,,Rider,Angel's Pizza,03/09/2026,IMUS,Rider refresher,ALEX,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Balik tanaw,Gtit,Maganda,5,,,,\n03/09/2026 11:42:01,,Store rider,Angel's Pizza,03/09/2026,TAGAYTAY,Rider refresher ,ALEX,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,GTIT,Quality service and customer service,Customer service,5,,,,\n03/09/2026 11:42:14,,RIDER,Angel's Pizza,03/09/2026,CAINTA,RIDER REFRESHER ,ALEX,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Lahat naman Ng natalakay sa rider refresher important biLang Isang rider ,Lahat naman Ng talakay Ng maayos at maliwanag,\"Napaka husay ni sir Alex mag refresh biLang Isang rider at kung paano magampanan Ng mabuti Ang rider at maiwasan Ang complain at paano mag win back Ang costumer, salamat .\",5,,,,\n03/09/2026 11:42:17,,Delivery rider,Angel's Pizza,03/09/2026,PETRON DASMA,Rider refresher,ALEX,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Good costumer service,Good costumer service,Good costumer service,5,,,,\n03/09/2026 11:46:01,,Rider,Angel's Pizza,03/09/2026,STA.ROSA,Rider refresher,ALEX,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Custumer service,Delivery specialist,Casher refresher,5,,,,\n03/09/2026 11:46:19,,Rider,Angel's Pizza,03/09/2026,MEYCAUAYAN,Rider refresher,\"ALEX, JOSHUA\",5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Refresh,Refresh,Refresh,5,,,,\n03/09/2026 12:01:28,,Raider ,Angel's Pizza,03/09/2026,MAKATI,Raider Refreshir,ALEX,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,N/a,N/a,N/a,5,,,,\n03/09/2026 12:04:10,,Raider,Angel's Pizza,03/09/2026,MAKATI,Raider Refreshir ,ALEX,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Ok,Ok,Ok,5,,,,\n03/09/2026 12:45:03,,Rider,Angel's Pizza,03/09/2026,NORTHRIDGE,Rider refresher,ALEX,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Good service try to win back the costumer,Good quality food deliver and greetings,Deliver time service and follow up procedure,5,,,,\n03/09/2026 12:48:58,,rider,Angel's Pizza,03/09/2026,WESTDRIVE,rider refresher,ALEX,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Good service and good delivery with appearance Delivery,GTIT,bawat store one a month  trainee delivery rider  GTIT para  malaman kung ginagawa talaga ng delivery rider yung tama  Process ng delivrry para  good image for costumer,5,,,,\n03/09/2026 12:57:11,,Delivery rider,Angel's Pizza,03/09/2026,MARIKINA,Rider refresher,ALEX,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Spell/gtit,Roll play,\"Continues to refresher until we master\nOf value and delivery of product \",5,,,,\n03/09/2026 17:21:03,,manager ,Figaro,03/09/2026,,Store visit ,(YANA) ALLIANA,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,\"since bago palang ako sa figaro company, kapag may concern or tanung po ako about sa store pwede po ako mag direct pm sya kanya. para ma guide na po ako.\",sa ngayon okay naman ,sa ngayon yong nabanggit ni maam yana regarding sa cross training.,1,,MONACO,,\n14/09/2026 16:12:06,,Barista,Figaro,14/09/2026,,Barista 101: Equipment,\"JOSHUA, (YANA) ALLIANA, (VER) JELIVER\",5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,For how to use cavfiza or espresso cleaning product,For using the cleaning materials and equipment,More latte art and barista knowledge,5,,WM SUCAT,,\n14/09/2026 16:12:27,,cashier ,Figaro,14/09/2026,,barista 101 training ,\"JAMES, (VER) JELIVER\",1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,paano linisin ang machine ng maayos. , wala naman na . ,N/A,1,,UST,,\n14/09/2026 16:13:13,,Barista,Figaro,14/09/2026,,EQUIPMENT TRAINING,\"JOSHUA, (VER) JELIVER\",5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Maintaining the equipment to ensure the quality,N/A,Equipment training,5,,WM NORTH EDSA,,\n14/09/2026 16:13:31,,Barista,Figaro,14/09/2026,,\"Barista equipment,  operations and maintenance seminar \",\"JOSHUA, (VER) JELIVER\",5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Equipment cleaning and maintenance ,N/a,N/a,5,,DELOS SANTOS,,\n14/09/2026 16:15:31,,Barista,Figaro,14/09/2026,,Ver,(VER) JELIVER,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Eapresso maintenance ,Coffee standard,Standardns,5,,F DASMA,,\n14/09/2026 16:15:48,,Teamleader,Figaro,14/09/2026,,Barista 101,(VER) JELIVER,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Backflashing,Closing procedure,Bar,5,,BRICK ROAD,,\n14/09/2026 16:15:49,,Barista,Figaro,11/07/2000,,Barista 101,\"JOSHUA, (YANA) ALLIANA, (VER) JELIVER\",5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,paglinis ng espresso machine,ang pag latte art,master class,5,,THEATER ZONE,,\n14/09/2026 16:17:21,,Cashier,Figaro,14/09/2026,,Barista 101: Equipment Seminar,\"JOSHUA, (YANA) ALLIANA, (VER) JELIVER\",5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,All,Na,Na,5,,MONACO,,\n14/09/2026 16:54:08,,Barista ,Figaro,14/09/2026,,training department ,JOSHUA,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,lahat ng mga tinuro ni training department ,kaalaman upang maalagaan ang kagamitan sa store ,n/a,5,,PGH,,\n17/09/2026 20:06:55,,Food Prep,Angel's Pizza Express,17/09/2026,,STORE VISIT,ANN,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Shelflife knowledge,Legendary shelflife,More knowledge,5,PORTA VAGA BAGUIO,,,\n18/09/2026 18:05:50,,Shift Manager,Angel's Pizza,18/09/2026,BAGUIO,STORE VISIT& TL VALIDATION,\"ANN, (YANA) ALLIANA\",5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,SOP refresher,None,None,5,,,,\n24/09/2026 11:41:01,,Kicthen staff,Angel's Pizza,24/09/2026,LUCAO,Customer service refresher,ALEX,5,5,5,4,4,4,5,5,5,5,5,5,5,5,5,about sa mga standard nang store,\"isasaulo at mas lalo, mung pag bubutihin nang yong trabaho\",nothing,5,,,,\n24/09/2026 11:41:09,,Service,Angel's Pizza,24/09/2026,LUCAO,Customer Service Reflesher,\"ALEX, LEO\",5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Lahat po ng sinabi nila,Gawin lahat ng natutunan upang mapabuti at mapabilis ang trabaho,Ang aking mga natutunan sa aming ginawa,5,,,,\n24/09/2026 11:41:30,,Cashier ,Angel's Pizza,24/09/2026,LUCAO,CUSTOMER SERVICE REFRESHER,\"ALEX, LEO\",5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Ang pagiging Isang customer service dahil dito makikita ng customers kung gaano sila kahalaga sa store ,Maging mabuti at maayos ang pakikisama sa mga customers upang silay ganahan at bumalik sa store,Maging aral lahat sa akin ang mga naituro sa amin at ito din ang magiging way upang tumaas ang benta ,5,,,,\n24/09/2026 11:45:20,,Makeline,Angel's Pizza,24/09/2026,LUCAO,Customer service refresher,ALEX,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Maslalong malawak ang natutunan ko ,Mas ma iimprove ko ang sarili ko dahil sa pag punta ng training dep,Makita nila na lahat ng tinuro saakin ayy nagawa ko na ng maayos ,5,,,,\n28/09/2026 15:56:45,,Management Trainee,Figaro,28/09/2026,,Store visit,(VER) JELIVER,5,5,4,4,5,5,5,5,5,5,5,5,5,5,5,  Giving insights in all aspects of the operation,I like having seminars and trainings it can help a lot in improving the skills and knowledge of the individuals,More on technical skills. So far the training department has a lot of activities that can really help the store improving their performance. ,5,,TRINOMA,,\n28/09/2026 21:47:22,,Cashier,Figaro,28/09/2026,,Store Visit,(VER) JELIVER,5,5,5,5,5,5,5,5,5,5,5,5,5,5,5,Panatilihin tandaan at sundin ang standard procedure sa trabaho.,handouts o presentation materials?,Bar,4,,TRINOMA,,\n";
+const SNAPSHOT_AT = "29 Sep 2026, 10:00";
+const FILE_ID = "1fyzDps5drwUupwI4tzUNxVMxh_oeTL_3QUlA5NSRlx8";
+let LAST = null, ITEMS = [], recs = [], FIX = {dates:[],acts:0,unmatched:{}};
+const GROUPS = {Delivery:[0,2,3,5,8], Content:[1,4,6,7], Impact:[9,10,11,12,13,14]};
+const TEAM = "Team Effort";
+const MONTHS = {"01":"Jan","02":"Feb","03":"Mar","04":"Apr","05":"May","06":"Jun","07":"Jul","08":"Aug","09":"Sep","10":"Oct","11":"Nov","12":"Dec"};
+const FULL = TDD;
+const state = {month:"all", brand:"all", excl:false, sort:{key:"n",dir:-1}, sel:null};
+
+const $ = id=>document.getElementById(id);
+const esc = s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt2 = v=>v==null||isNaN(v)?"–":v.toFixed(2);
+const pct = v=>v==null||isNaN(v)?"–":Math.round(v*100)+"%";
+const band = v=>v>=4.5?["Excellent","b-ex"]:v>=4?["Very Good","b-vg"]:v>=3?["Good","b-gd"]:["Fair / Poor","b-lo"];
+const fdate = d=>{const [y,m,dd]=d.split("-");return `${+dd} ${MONTHS[m]||m}`};
+const mean = a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:NaN;
+const junk = s=>!s||/^(none|n\/?a|nothing|wala.*|\?|ok(ay)?|good|no|na|none so far)\.?$/i.test(s.trim())||s.trim().length<3;
+
+function filtered(){
+  return recs.filter(r=>(state.month==="all"||r.month===state.month)&&(state.brand==="all"||r.brand===state.brand)&&!(state.excl&&r.rev));
+}
+function groups(rs){
+  const g = new Map();
+  for(const r of rs){
+    const ks = r.fac.length? r.fac : [TEAM];
+    for(const k of ks){ if(!g.has(k)) g.set(k,[]); g.get(k).push(r); }
+  }
+  return g;
+}
+function metrics(name, rs){
+  const sec = k=>mean(rs.map(r=>mean(GROUPS[k].map(i=>r.s[i]))));
+  const co = rs.filter(r=>r.fac.length>1).length;
+  return {name, team:name===TEAM, rs, n:rs.length, solo:rs.length-co, co,
+    stores:new Set(rs.map(r=>r.store).filter(Boolean)).size,
+    days:new Set(rs.map(r=>r.date)).size,
+    brands:[...new Set(rs.map(r=>r.brand))],
+    avg:mean(rs.map(r=>r.mean)), del:sec("Delivery"), con:sec("Content"), imp:sec("Impact"),
+    sat:rs.filter(r=>r.s[9]>=4).length/rs.length, low:rs.filter(r=>r.mean<3).length};
+}
+
+const COLS = [
+  {k:"rank",l:"#",nos:true},
+  {k:"name",l:"Facilitator"},
+  {k:"n",l:"Evals"},
+  {k:"solo",l:"Solo / Co"},
+  {k:"stores",l:"Stores"},
+  {k:"days",l:"Activity days"},
+  {k:"avg",l:"Avg rating"},
+  {k:"del",l:"Delivery"},
+  {k:"con",l:"Content"},
+  {k:"imp",l:"Impact"},
+  {k:"sat",l:"Satisfied"},
+  {k:"low",l:"Low (<3)"},
+  {k:"band",l:"Rating",nos:true},
+];
+
+function render(){
+  const rs = filtered();
+  const g = groups(rs);
+  const all = [...g.entries()].map(([k,v])=>metrics(k,v));
+  const named = all.filter(m=>!m.team);
+  const team = all.find(m=>m.team);
+  const {key,dir} = state.sort;
+  named.sort((a,b)=>{const x=a[key],y=b[key]; if(typeof x==="string") return dir*x.localeCompare(y); return dir*((x-y)||(b.n-a.n)||(b.avg-a.avg));});
+  if(key==="n"||key==="avg"){} // ranks follow the current sort
+  const deptAvg = mean(rs.map(r=>r.mean));
+
+  // KPIs
+  const teamShare = rs.length? rs.filter(r=>!r.fac.length).length/rs.length : NaN;
+  const [bl] = band(deptAvg||0);
+  $("kpis").innerHTML = [
+    ["Evaluations received", rs.length, `${new Set(rs.map(r=>r.date)).size} activity days · ${new Set(rs.map(r=>r.store)).size} stores`],
+    ["Department avg rating", `${fmt2(deptAvg)}<small> / 5</small>`, rs.length? `${bl} band` : "No responses"],
+    ["Satisfaction rate", pct(rs.filter(r=>r.s[9]>=4).length/rs.length), "Rated 4–5 on overall satisfaction"],
+    ["Named facilitators", named.length, named.length? `Most evaluated: ${named.slice().sort((a,b)=>b.n-a.n)[0].name}` : "–"],
+    ["Team Effort share", pct(teamShare), `${team?team.n:0} responses with no named facilitator`],
+  ].map(([l,v,h])=>`<div class="kpi"><div class="lbl">${l}</div><div class="val">${v}</div><div class="hint">${esc(h)}</div></div>`).join("");
+
+  // table
+  $("score").tHead.innerHTML = "<tr>"+COLS.map(c=>c.nos?`<th>${c.l}</th>`:`<th><button type="button" data-k="${c.k}" ${key===c.k?`data-dir="${dir<0?"↓":"↑"}"`:""}>${c.l}</button></th>`).join("")+"</tr>";
+  const row = (m,i)=>{
+    const [bt,bc]=band(m.avg);
+    const role = m.team? "No individual named" : (FULL.has(m.name)?"":"Not on TDD roster list");
+    return `<tr tabindex="0" data-name="${esc(m.name)}" class="${m.team?"team":""}" aria-selected="${state.sel===m.name}">
+      <td class="rank">${m.team?"—":i+1}</td>
+      <td class="name"><span class="sw" style="background:var(${m.team?"--team":"--series"})"></span>${esc(m.name)}${m.n<5?'<span class="lowsample">LOW n</span>':""}${role?`<small>${esc(role)}</small>`:""}</td>
+      <td><b>${m.n}</b></td><td class="dim">${m.solo} / ${m.co}</td><td>${m.stores}</td><td>${m.days}</td>
+      <td><b>${fmt2(m.avg)}</b></td><td>${fmt2(m.del)}</td><td>${fmt2(m.con)}</td><td>${fmt2(m.imp)}</td>
+      <td>${pct(m.sat)}</td><td class="${m.low?"flag":"dim"}">${m.low}</td>
+      <td><span class="pill ${bc}">${bt}</span></td></tr>`;
+  };
+  $("score").tBodies[0].innerHTML = named.map(row).join("") + (team?row(team):"") ||
+    `<tr><td colspan="13" class="empty">No responses match these filters.</td></tr>`;
+
+  const ordered = named.slice().sort((a,b)=>b.n-a.n||b.avg-a.avg).concat(team?[team]:[]);
+  drawCount(ordered); drawAvg(ordered, deptAvg); drawHeat(g);
+  // profile
+  const names = ordered.map(m=>m.name);
+  if(!names.includes(state.sel)) state.sel = names[0]||null;
+  $("facSel").innerHTML = names.map(n=>`<option ${n===state.sel?"selected":""}>${esc(n)}</option>`).join("");
+  document.querySelectorAll("#score tbody tr").forEach(tr=>tr.setAttribute("aria-selected", tr.dataset.name===state.sel));
+  drawProfile(all.find(m=>m.name===state.sel), rs);
+  drawLow(rs);
+  LAST = {named, team, deptAvg, n:rs.length};
+  $("filterNote").textContent = `${rs.length} of ${recs.length} responses shown`;
+}
+
+const tip = $("tip");
+function showTip(e,html){tip.innerHTML=html;tip.hidden=false;const x=Math.min(e.clientX+14, innerWidth-tip.offsetWidth-8);const y=Math.min(e.clientY+14, innerHeight-tip.offsetHeight-8);tip.style.left=x+"px";tip.style.top=y+"px";}
+function hideTip(){tip.hidden=true}
+function bindTips(svg){
+  svg.querySelectorAll("[data-tip]").forEach(el=>{
+    el.addEventListener("pointermove",e=>showTip(e,el.dataset.tip));
+    el.addEventListener("pointerleave",hideTip);
+  });
+}
+function svgW(svg){return Math.max(300, svg.clientWidth||svg.parentNode.clientWidth-36)}
+
+function drawCount(list){
+  const svg=$("cCount"), W=svgW(svg), L=Math.min(150,W*.36), R=36, rowH=26, top=6, H=top+list.length*rowH+24;
+  const max=Math.max(1,...list.map(m=>m.n)); const nice=Math.ceil(max/10)*10;
+  const x=v=>L+(W-L-R)*v/nice;
+  let s="";
+  for(let t=0;t<=nice;t+=nice/5){s+=`<line x1="${x(t)}" x2="${x(t)}" y1="${top}" y2="${H-22}" stroke="var(--grid)"/><text x="${x(t)}" y="${H-6}" text-anchor="middle" font-size="11" fill="var(--muted)">${t}</text>`;}
+  list.forEach((m,i)=>{
+    const y=top+i*rowH, bw=Math.max(2,x(m.n)-L);
+    s+=`<g data-tip="<b>${esc(m.name)}</b><br>${m.n} evaluations · ${m.solo} solo, ${m.co} co-facilitated<br>${m.stores} stores · ${m.days} activity days">
+      <rect x="0" y="${y}" width="${W}" height="${rowH}" fill="transparent"/>
+      <text x="${L-8}" y="${y+rowH/2+4}" text-anchor="end" font-size="12" fill="var(--ink-2)">${esc(short(m.name))}</text>
+      <rect x="${L}" y="${y+6}" width="${bw}" height="${rowH-12}" rx="3" fill="var(${m.team?"--team":"--series"})"/>
+      <text x="${L+bw+6}" y="${y+rowH/2+4}" font-size="12" font-weight="600" fill="var(--ink)">${m.n}</text></g>`;
+  });
+  s+=`<line x1="${L}" x2="${L}" y1="${top}" y2="${H-22}" stroke="var(--line-2)"/>`;
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`); svg.setAttribute("height",H); svg.innerHTML=s; bindTips(svg);
+}
+function short(n){return n.replace(" (Yana)","").replace(" (Rice)","")}
+function drawAvg(list, dept){
+  const svg=$("cAvg"), W=svgW(svg), L=Math.min(150,W*.36), R=40, rowH=26, top=6, H=top+list.length*rowH+24;
+  const minV=Math.min(3,...list.map(m=>m.avg)); const lo=Math.floor(minV*2)/2;
+  const x=v=>L+(W-L-R)*(v-lo)/(5-lo);
+  let s="";
+  for(let t=lo;t<=5.0001;t+=0.5){s+=`<line x1="${x(t)}" x2="${x(t)}" y1="${top}" y2="${H-22}" stroke="var(--grid)"/><text x="${x(t)}" y="${H-6}" text-anchor="middle" font-size="11" fill="var(--muted)">${t.toFixed(1)}</text>`;}
+  if(!isNaN(dept)) s+=`<line x1="${x(dept)}" x2="${x(dept)}" y1="${top}" y2="${H-22}" stroke="var(--ink-2)" stroke-dasharray="4 3"/>`;
+  list.forEach((m,i)=>{
+    const y=top+i*rowH+rowH/2;
+    s+=`<g data-tip="<b>${esc(m.name)}</b><br>Average ${fmt2(m.avg)} · ${band(m.avg)[0]}<br>Delivery ${fmt2(m.del)} · Content ${fmt2(m.con)} · Impact ${fmt2(m.imp)}<br>${m.n} evaluations">
+      <rect x="0" y="${y-rowH/2}" width="${W}" height="${rowH}" fill="transparent"/>
+      <text x="${L-8}" y="${y+4}" text-anchor="end" font-size="12" fill="var(--ink-2)">${esc(short(m.name))}</text>
+      <line x1="${L}" x2="${x(m.avg)}" y1="${y}" y2="${y}" stroke="var(--line-2)" stroke-width="2"/>
+      <circle cx="${x(m.avg)}" cy="${y}" r="5.5" fill="var(${m.team?"--team":"--series"})" stroke="var(--surface)" stroke-width="2"/>
+      <text x="${x(m.avg)+10}" y="${y+4}" font-size="12" font-weight="600" fill="var(--ink)">${fmt2(m.avg)}</text></g>`;
+  });
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`); svg.setAttribute("height",H); svg.innerHTML=s; bindTips(svg);
+}
+function drawHeat(g){
+  const months = monthKeys().filter(m=>state.month==="all"||m===state.month);
+  const list=[...g.entries()].map(([k,v])=>({k,v})).sort((a,b)=>(a.k===TEAM)-(b.k===TEAM)||b.v.length-a.v.length);
+  const max=Math.max(1,...list.flatMap(o=>months.map(m=>o.v.filter(r=>r.month===m).length)));
+  let h=`<thead><tr><th>Facilitator</th>${months.map(m=>`<th style="text-align:center">${monthLabel(m)}</th>`).join("")}<th style="text-align:center">Total</th></tr></thead><tbody>`;
+  for(const o of list){
+    h+=`<tr style="cursor:default"><td>${esc(o.k)}</td>`;
+    for(const m of months){const c=o.v.filter(r=>r.month===m).length;const p=c?Math.round(12+78*c/max):0;
+      const bg=c?`color-mix(in srgb, var(${o.k===TEAM?"--team":"--series"}) ${p}%, var(--surface))`:"transparent";
+      h+=`<td style="background:${bg};color:${p>52?"#fff":c?"var(--ink)":"var(--muted)"}">${c||"·"}</td>`;}
+    h+=`<td><b>${o.v.length}</b></td></tr>`;
+  }
+  $("heat").innerHTML=h+"</tbody>";
+}
+function drawProfile(m, rs){
+  if(!m){$("pTitle").textContent="Facilitator profile";$("pStats").innerHTML='<span class="empty">No responses match these filters.</span>';["pActs","pCo","pStores","pVal","pImp"].forEach(i=>$(i).innerHTML="");$("cCrit").innerHTML="";return;}
+  $("pTitle").textContent = m.name;
+  $("pLeg").textContent = short(m.name);
+  const [bt,bc]=band(m.avg);
+  $("pStats").innerHTML = [[m.n,"evaluations"],[fmt2(m.avg),"avg rating"],[pct(m.sat),"satisfied"],[m.stores,"stores"],[m.days,"activity days"],[m.brands.length,"brand"+(m.brands.length>1?"s":"")]]
+    .map(([a,b])=>`<span class="stat"><b>${a}</b>${b}</span>`).join("")+` <span class="pill ${bc}" style="align-self:center">${bt}</span>`;
+  // criteria
+  const svg=$("cCrit"), W=svgW(svg), narrow=W<560, R=40, top=4;
+  const L=narrow?8:Math.min(300,W*.58), rowH=narrow?40:24, H=top+ITEMS.length*rowH+24;
+  const maxCh=narrow?Math.floor((W-12)/6.3):Math.floor((L-16)/6.3);
+  const fv=ITEMS.map((_,i)=>mean(m.rs.map(r=>r.s[i]))), dv=ITEMS.map((_,i)=>mean(rs.map(r=>r.s[i])));
+  const lo=Math.floor(Math.min(3,...fv,...dv)*2)/2, x=v=>L+(W-L-R)*(v-lo)/(5-lo);
+  let s="";
+  for(let t=lo;t<=5.0001;t+=0.5){s+=`<line x1="${x(t)}" x2="${x(t)}" y1="${top}" y2="${H-22}" stroke="var(--grid)"/><text x="${x(t)}" y="${H-6}" text-anchor="middle" font-size="11" fill="var(--muted)">${t.toFixed(1)}</text>`;}
+  ITEMS.forEach((it,i)=>{const y0=top+i*rowH, y=narrow?y0+28:y0+rowH/2; const lbl=it.length>maxCh?it.slice(0,maxCh-1)+"…":it;
+    const sep = (i===9)?`<line x1="0" x2="${W}" y1="${y0}" y2="${y0}" stroke="var(--line-2)" stroke-dasharray="2 3"/>`:"";
+    const lab = narrow?`<text x="${L}" y="${y0+13}" font-size="11.5" fill="var(--ink-2)">${esc(lbl)}</text>`:`<text x="${L-10}" y="${y+4}" text-anchor="end" font-size="11.5" fill="var(--ink-2)">${esc(lbl)}</text>`;
+    s+=`${sep}<g data-tip="<b>${esc(it)}</b><br>${esc(m.name)}: ${fmt2(fv[i])}<br>Department: ${fmt2(dv[i])}">
+    <rect x="0" y="${y0}" width="${W}" height="${rowH}" fill="transparent"/>${lab}
+    <line x1="${x(Math.min(fv[i],dv[i]))}" x2="${x(Math.max(fv[i],dv[i]))}" y1="${y}" y2="${y}" stroke="var(--line-2)" stroke-width="2"/>
+    <circle cx="${x(dv[i])}" cy="${y}" r="4.5" fill="var(--surface)" stroke="var(--muted)" stroke-width="2"/>
+    <circle cx="${x(fv[i])}" cy="${y}" r="5" fill="var(${m.team?"--team":"--series"})" stroke="var(--surface)" stroke-width="1.5"/>
+    <text x="${W-2}" y="${y+4}" text-anchor="end" font-size="11.5" font-weight="600" fill="var(--ink)">${fmt2(fv[i])}</text></g>`;});
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`); svg.setAttribute("height",H); svg.innerHTML=s; bindTips(svg);
+  // activities
+  const ac={}; m.rs.forEach(r=>ac[r.cat]=(ac[r.cat]||0)+1);
+  $("pActs").innerHTML=Object.entries(ac).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<li><span>${esc(k)}</span><span>${v}</span></li>`).join("");
+  const co={}; m.rs.forEach(r=>r.fac.forEach(f=>{if(f!==m.name) co[f]=(co[f]||0)+1}));
+  $("pCo").innerHTML=Object.keys(co).length?Object.entries(co).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<span class="chip">${esc(short(k))} · ${v}</span>`).join(""):'<span class="empty">Solo sessions only</span>';
+  const st={}; m.rs.forEach(r=>{if(r.store) st[r.store]=(st[r.store]||0)+1});
+  $("pStores").innerHTML=Object.entries(st).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).map(([k,v])=>`<span class="chip">${esc(k)}${v>1?" · "+v:""}</span>`).join("");
+  const q=(arr)=>arr.length?arr.map(o=>`<div class="q">${esc(o.t)}<small>${esc(o.m)}</small></div>`).join(""):'<span class="empty">No written comments.</span>';
+  const meta=r=>`${r.pos||"Staff"} · ${r.store||r.brand} · ${fdate(r.date)}`;
+  $("pVal").innerHTML=q(m.rs.filter(r=>!junk(r.val)).map(r=>({t:r.val,m:meta(r)})));
+  $("pImp").innerHTML=q(m.rs.flatMap(r=>[!junk(r.imp)&&{t:"Improve: "+r.imp,m:meta(r)},!junk(r.top)&&{t:"Topic: "+r.top,m:meta(r)}].filter(Boolean)));
+}
+function drawLow(rs){
+  const low=rs.filter(r=>r.mean<3).sort((a,b)=>a.date.localeCompare(b.date));
+  $("lowT").innerHTML = low.length? `<thead><tr><th>Date</th><th>Store</th><th>Activity</th><th>Credited to</th><th>Avg</th><th style="text-align:left">Participant comment</th></tr></thead><tbody>`+
+    low.map(r=>`<tr style="cursor:default"><td style="text-align:left">${fdate(r.date)}</td><td style="text-align:left">${esc(r.store)}</td><td style="text-align:left">${esc(r.cat)}</td><td style="text-align:left">${esc(r.fac.length?r.fac.map(short).join(", "):TEAM)}</td><td class="flag">${fmt2(r.mean)}</td><td style="text-align:left;white-space:normal;min-width:240px">${esc(r.val||"–")}${r.rev?' <span class="pill b-gd">likely misread</span>':""}</td></tr>`).join("")+"</tbody>"
+    : '<tbody><tr><td class="empty" style="text-align:left">No responses below 3.00 for these filters.</td></tr></tbody>';
+}
+
+// ---- data loading ----
+function monthKeys(){return [...new Set(recs.map(r=>r.month))].sort()}
+function monthLabel(k){const [y,m]=k.split("-");return `${MONTHS[m]} ${y}`}
+function load(text){
+  const D = processCSV(text);
+  ITEMS = D.items; FIX = D.fixes;
+  recs = D.recs.map(r=>({...r, mean:r.s.reduce((a,b)=>a+b,0)/15, month:r.date.slice(0,7), rev:r.s.every(v=>v===1)}));
+  const mk = monthKeys();
+  if(state.month!=="all" && !mk.includes(state.month)) state.month="all";
+  $("monthSeg").innerHTML = `<button type="button" data-m="all" aria-pressed="${state.month==="all"}">All months</button>`+
+    mk.map(k=>`<button type="button" data-m="${k}" aria-pressed="${state.month===k}">${MONTHS[k.slice(5)]}</button>`).join("");
+  const brands=[...new Set(recs.map(r=>r.brand))].sort();
+  if(state.brand!=="all" && !brands.includes(state.brand)) state.brand="all";
+  $("brandSel").innerHTML = `<option value="all">All brands</option>`+brands.map(b=>`<option value="${esc(b)}" ${b===state.brand?"selected":""}>${esc(b)}</option>`).join("");
+  const dates=recs.map(r=>r.date).sort();
+  const y0=dates[0].slice(0,4), y1=dates.at(-1).slice(0,4);
+  $("periodLbl").textContent = `${fdate(dates[0])}${y0!==y1?" "+y0:""} – ${fdate(dates.at(-1))} ${y1}`;
+  $("nAll").textContent=recs.length;
+  const nrev=recs.filter(r=>r.rev).length;
+  $("revCount").textContent=`(${nrev})`;
+  $("revNote").textContent= nrev ? `${nrev} response${nrev>1?"s":""} rated every item 1 (Poor), in most cases while writing positive comments such as "all they've said is helpful". These look like respondents reading 1 as the best score. They are kept by default so the report matches the raw survey; tick "Exclude likely scale misreads" to see ratings without them.` : "No responses rated every item 1.";
+  const um=Object.entries(FIX.unmatched);
+  $("unmNote").textContent = um.length ? `New names not on the list yet, shown as written: ${um.map(([n,c])=>`${n} (${c})`).join(", ")}. Tell Claude who they are so they can be matched.` : "";
+  const nd=FIX.dates.length;
+  $("fixNote").textContent = (nd? `${nd} activity date${nd>1?"s were":" was"} invalid (${FIX.dates.join(", ")}) and replaced with the submission date. ` : "All activity dates were valid. ") +
+    (FIX.acts? `${FIX.acts} response${FIX.acts>1?"s":""} with a blank or unclear activity were assigned the activity recorded at the same store or by the same facilitator that day.` : "");
+  render();
+}
+function b64ToText(b64){
+  const bin=atob(b64.replace(/\s/g,"")); const bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+  return new TextDecoder("utf-8").decode(bytes);
+}
+function setSync(kind, text, msg){
+  $("syncDot").className="dot "+(kind||"");
+  $("syncTxt").textContent=text;
+  $("syncMsg").hidden=!msg; $("syncMsg").textContent=msg||"";
+}
+const FIX_COPY = {
+  needs_reauth: "Google Drive needs to be reconnected. Reconnect it in claude.ai Settings → Connectors, then press Refresh.",
+  server_not_connected: "Google Drive isn't connected for your account. Add it in claude.ai Settings → Connectors, then press Refresh.",
+  selection_required: "You have more than one Google Drive connector. Choose one when claude.ai asks, then press Refresh.",
+  not_in_manifest: "Google Drive access is turned off for this page. Allow it from the page's connector prompt, then press Refresh.",
+  blocked_by_policy: "Your organization's policy blocks this Google Drive tool here.",
+  approval_required: "Your organization requires approval for this Google Drive tool, which this page can't request.",
+  not_granted: "Live data isn't available in this view. Showing the saved snapshot.",
+  capability_disabled: "Live data isn't available in this view. Showing the saved snapshot.",
+  capability_removed: "Live data isn't available in this view. Showing the saved snapshot.",
+};
+let mcp=null, busy=false, retried=false;
+async function syncLive(){
+  if(!mcp||busy) return;
+  busy=true; $("refreshBtn").disabled=true; setSync("busy","Syncing with Google Drive…");
+  try{
+    const res = await mcp.callTool("Google Drive","download_file_content",{fileId:FILE_ID, exportMimeType:"text/csv"},{cache:false});
+    const p = res.payload;
+    const b64 = p && typeof p==="object" ? p.content : null;
+    if(typeof b64!=="string") throw {code:"bad_shape", message:"Google Drive returned the sheet in an unexpected format."};
+    const text = /^Timestamp/.test(b64) ? b64 : b64ToText(b64);
+    load(text);
+    const t=new Date(res.cache?.storedAt||Date.now());
+    setSync("live",`Live · synced ${t.toLocaleString([], {day:"numeric",month:"short",hour:"numeric",minute:"2-digit"})}`);
+    $("srcNote").textContent="Read live from Google Drive.";
+    retried=false;
+  }catch(err){
+    const code=err&&err.code;
+    if(err&&err.retryable&&!retried){ retried=true; busy=false; setTimeout(syncLive,(err.retryAfterMs||1500)+Math.random()*1000); return; }
+    const msg = FIX_COPY[code] || (code==="tool_error" ? `Google Drive couldn't read the sheet: ${err.message||"no details"}. Check that your Drive account can open the response spreadsheet.` :
+      code==="server_unavailable" ? "Google Drive didn't answer. Press Refresh to try again." :
+      (err&&err.message) || "Couldn't reach Google Drive.");
+    setSync("warn", `Showing snapshot from ${SNAPSHOT_AT}`, msg);
+  }finally{ busy=false; $("refreshBtn").disabled=!mcp; }
+}
+async function exportCSV(dl){
+  if(!LAST) return;
+  const q=v=>{const s=String(v??"");return /[",\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s};
+  const f=v=>isNaN(v)?"":v.toFixed(2);
+  const head=["Rank","Facilitator","Evaluations","Solo","Co-facilitated","Stores","Activity days","Avg rating","Delivery","Content","Impact","Satisfied %","Low (<3)","Rating band"];
+  const row=(m,i)=>[m.team?"":i+1,m.name,m.n,m.solo,m.co,m.stores,m.days,f(m.avg),f(m.del),f(m.con),f(m.imp),Math.round(m.sat*100),m.low,band(m.avg)[0]];
+  const lines=[head,...LAST.named.map(row),...(LAST.team?[row(LAST.team)]:[])].map(r=>r.map(q).join(","));
+  const tag=(state.month==="all"?"All-months":monthLabel(state.month).replace(" ","-"))+(state.brand==="all"?"":"_"+state.brand.replace(/[^A-Za-z]+/g,""));
+  try{ await dl.save({filename:`Facilitator_KPI_${tag}.csv`, data:"\ufeff"+lines.join("\r\n")}); }
+  catch(e){ if(e&&e.code!=="declined") setSync($("syncDot").className.replace("dot ",""), $("syncTxt").textContent, "Couldn't save the file: "+(e.message||e.code)); }
+}
+(async()=>{ let dl=null; try{ dl = window.claude && await window.claude.use("downloads"); }catch(e){}
+  if(dl){ $("expBtn").hidden=false; $("expBtn").addEventListener("click",()=>exportCSV(dl)); } })();
+$("refreshBtn").addEventListener("click",()=>{retried=false;syncLive();});
+$("refreshBtn").disabled=true;
+load(SNAPSHOT_CSV);
+setSync("", `Snapshot from ${SNAPSHOT_AT}`);
+$("srcNote").textContent=`Showing the saved snapshot from ${SNAPSHOT_AT} until Google Drive answers.`;
+(async()=>{
+  try{ mcp = window.claude && await window.claude.use("mcp"); }catch(e){ mcp=null; }
+  if(!mcp){ setSync("", `Snapshot from ${SNAPSHOT_AT}`, "Live Google Drive data isn't available in this view (for example a downloaded copy). Open the page on claude.ai to see new responses."); $("refreshBtn").hidden=true; return; }
+  $("refreshBtn").disabled=false;
+  syncLive();
+})();
+$("monthSeg").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;state.month=b.dataset.m;$("monthSeg").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));render();});
+$("brandSel").addEventListener("change",e=>{state.brand=e.target.value;render();});
+$("exclRev").addEventListener("change",e=>{state.excl=e.target.checked;render();});
+$("facSel").addEventListener("change",e=>{state.sel=e.target.value;render();});
+$("score").addEventListener("click",e=>{
+  const b=e.target.closest("th button"); if(b){const k=b.dataset.k; state.sort = state.sort.key===k?{key:k,dir:-state.sort.dir}:{key:k,dir:k==="name"?1:-1}; render(); return;}
+  const tr=e.target.closest("tbody tr[data-name]"); if(tr){state.sel=tr.dataset.name; render(); $("profile").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});}
+});
+$("score").addEventListener("keydown",e=>{if(e.key==="Enter"){const tr=e.target.closest("tbody tr[data-name]");if(tr){state.sel=tr.dataset.name;render();}}});
+let rt; addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(render,120)});
+render();
+</script>
+
+</body></html>

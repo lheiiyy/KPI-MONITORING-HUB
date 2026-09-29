@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Facilitator KPI Scorecard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: operations scorecard — filter bar, KPI strip, ranked scorecard table, then charts and per-facilitator drill-down */
+:root{
+  --bg:#f5f6f8; --surface:#ffffff; --ink:#141820; --ink-2:#4b5361; --muted:#7a8392;
+  --line:#e2e5ea; --line-2:#cdd2da; --accent:#1c56b8; --accent-soft:#e8effa;
+  --series:#2a78d6; --team:#eb6834; --grid:#eceef2;
+  --good:#0a7d0a; --good-bg:#e5f4e5; --warn:#8a5a00; --warn-bg:#fdf1d6; --crit:#b42f2f; --crit-bg:#fbe7e7; --vg:#1c56b8; --vg-bg:#e8effa;
+  --display:"Schibsted Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1116; --surface:#161a21; --ink:#f1f3f6; --ink-2:#b8bfcb; --muted:#8a93a2;
+  --line:#272d37; --line-2:#363d49; --accent:#7fa9f0; --accent-soft:#1c2740;
+  --series:#3987e5; --team:#d95926; --grid:#222831;
+  --good:#3fc33f; --good-bg:#15291a; --warn:#f2b73a; --warn-bg:#2d2511; --crit:#f07575; --crit-bg:#331a1c; --vg:#8db4f5; --vg-bg:#1c2740;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1116; --surface:#161a21; --ink:#f1f3f6; --ink-2:#b8bfcb; --muted:#8a93a2;
+  --line:#272d37; --line-2:#363d49; --accent:#7fa9f0; --accent-soft:#1c2740;
+  --series:#3987e5; --team:#d95926; --grid:#222831;
+  --good:#3fc33f; --good-bg:#15291a; --warn:#f2b73a; --warn-bg:#2d2511; --crit:#f07575; --crit-bg:#331a1c; --vg:#8db4f5; --vg-bg:#1c2740;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:14px/1.5 var(--body)}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:20px;padding-block:28px 56px;display:grid;gap:22px}
+header{display:grid;gap:6px}
+.eyebrow{font:500 11.5px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font:800 clamp(26px,4vw,36px)/1.1 var(--display);letter-spacing:-.01em;margin:0;text-wrap:balance}
+h2{font:700 17px/1.25 var(--display);margin:0}
+.sub{color:var(--ink-2);margin:0;max-width:75ch}
+.sub b{color:var(--ink);font-weight:600}
+.bar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.seg{display:inline-flex;border:1px solid var(--line-2);border-radius:8px;overflow:hidden}
+.seg button{font:500 13px var(--body);border:0;background:transparent;color:var(--ink-2);padding:6px 12px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line-2)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff}
+:root[data-theme="dark"] .seg button[aria-pressed="true"]{color:#0e1116}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .seg button[aria-pressed="true"]{color:#0e1116}}
+label.ctl{display:inline-flex;align-items:center;gap:8px;color:var(--ink-2);font-size:13px}
+select{font:500 13px var(--body);color:var(--ink);background:var(--surface);border:1px solid var(--line-2);border-radius:8px;padding:6px 8px}
+input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px}
+button:focus-visible,select:focus-visible,input:focus-visible,tr:focus-visible,th button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.spacer{flex:1}
+.fnote{font-size:12px;color:var(--muted)}
+.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:grid;gap:4px;align-content:start}
+.kpi .lbl{font:500 11px/1.2 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.kpi .val{font:700 28px/1.1 var(--display)}
+.kpi .val small{font:500 14px var(--body);color:var(--muted)}
+.kpi .hint{font-size:12.5px;color:var(--ink-2)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:grid;gap:14px;min-width:0}
+.phead{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;justify-content:space-between}
+.phead p{margin:0;color:var(--muted);font-size:12.5px}
+.tscroll{overflow-x:auto;margin-inline:-4px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:9px 8px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+th{font:500 11px/1.2 var(--mono);letter-spacing:.04em;text-transform:uppercase;color:var(--muted);vertical-align:bottom}
+th button{all:unset;cursor:pointer;display:inline-flex;gap:4px;align-items:center}
+th button[data-dir]::after{content:attr(data-dir);color:var(--accent)}
+th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}
+td{font-variant-numeric:tabular-nums}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:var(--accent-soft)}
+tbody tr[aria-selected="true"]{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
+tr.team td{border-top:2px solid var(--line-2)}
+.rank{color:var(--muted);font-family:var(--mono);font-size:12px;width:28px}
+.name{font-weight:600}
+.name .sw{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:8px;vertical-align:1px}
+.name small{display:block;font-weight:400;color:var(--muted);font-size:11.5px}
+.dim{color:var(--muted)}
+.pill{display:inline-block;font:600 11px/1 var(--body);padding:4px 8px;border-radius:999px;letter-spacing:.02em}
+.b-ex{color:var(--good);background:var(--good-bg)} .b-vg{color:var(--vg);background:var(--vg-bg)} .b-gd{color:var(--warn);background:var(--warn-bg)} .b-lo{color:var(--crit);background:var(--crit-bg)}
+.flag{color:var(--crit);font-weight:600}
+.lowsample{font:500 10.5px var(--mono);color:var(--warn);background:var(--warn-bg);border-radius:4px;padding:1px 5px;margin-left:6px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media (max-width:900px){.grid2{grid-template-columns:1fr}}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink-2)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.legend i.ring{border-radius:50%;background:transparent!important;border:2px solid var(--muted)}
+svg text{font-family:var(--body)}
+.chart{width:100%;display:block}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12px;padding:7px 9px;border-radius:6px;max-width:260px;z-index:10;line-height:1.35;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.tip b{font-weight:600}
+.heat td{text-align:center;font-weight:500}
+.heat td:first-child{text-align:left;font-weight:600}
+.detail{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px}
+@media (max-width:900px){.detail{grid-template-columns:1fr}}
+.stats{display:flex;flex-wrap:wrap;gap:8px}
+.stat{border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12.5px;color:var(--ink-2)}
+.stat b{color:var(--ink);font:600 15px var(--display);margin-right:4px}
+.list{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.list li{display:flex;justify-content:space-between;gap:10px;font-size:13px;border-bottom:1px dashed var(--line);padding-bottom:5px}
+.list li span:last-child{font-variant-numeric:tabular-nums;color:var(--ink-2)}
+h3{font:600 12px/1.2 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:4px 0 8px}
+.quotes{display:grid;gap:8px;max-height:340px;overflow:auto;padding-right:4px}
+.q{border-left:2px solid var(--line-2);padding:2px 0 2px 10px;font-size:13px}
+.q small{display:block;color:var(--muted);font-size:11.5px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;border:1px solid var(--line-2);border-radius:999px;padding:2px 9px;color:var(--ink-2)}
+.notes{font-size:13px;color:var(--ink-2);display:grid;gap:6px}
+.notes p{margin:0;max-width:95ch}
+.notes b{color:var(--ink)}
+.empty{color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion:no-preference){tbody tr{transition:background .12s}}
+.kraNav{display:flex;align-items:center;gap:8px;font:500 13px var(--body);color:var(--ink-2);text-decoration:none;padding:8px 2px 0}
+.kraNav:hover{color:var(--accent)}
+</style>
+
+</head><body>
+<div class="wrap">
+<a class="kraNav" href="../index.html">&larr; KPI Monitoring Initiative &middot; Coaching &amp; Feedback (20%)</a>
+<header>
+  <div class="eyebrow">Training &amp; Development Division · HRAD · Figaro Culinary Group</div>
+  <h1>Facilitator KPI Scorecard</h1>
+  <p class="sub">Based on the <b>Store Visit Evaluation Survey</b> responses, <b id="periodLbl"></b>. Rated on the survey's 5-point scale (5 Excellent · 4 Very Good · 3 Good · 2 Fair · 1 Poor). Responses that name no specific facilitator are credited to <b>Team Effort</b>.</p>
+</header>
+
+<div class="bar" role="group" aria-label="Filters">
+  <div class="seg" id="monthSeg" role="group" aria-label="Month">
+    <button type="button" data-m="all" aria-pressed="true">All months</button>
+    <button type="button" data-m="07" aria-pressed="false">Jul</button>
+    <button type="button" data-m="08" aria-pressed="false">Aug</button>
+    <button type="button" data-m="09" aria-pressed="false">Sep</button>
+  </div>
+  <label class="ctl" for="brandSel">Brand
+    <select id="brandSel"><option value="all">All brands</option></select>
+  </label>
+  <label class="ctl" for="exclRev"><input type="checkbox" id="exclRev"> Exclude likely scale misreads <span class="fnote" id="revCount"></span></label>
+  <span class="spacer"></span>
+  <span class="fnote" id="filterNote"></span>
+</div>
+
+<section class="kpis" id="kpis" aria-label="Summary"></section>
+
+<section class="panel">
+  <div class="phead"><h2>Facilitator scorecard</h2><p>Click a column to sort · click a row to open the facilitator's profile below</p></div>
+  <div class="tscroll"><table id="score"><thead></thead><tbody></tbody></table></div>
+  <div class="legend">
+    <span><span class="pill b-ex">Excellent</span> 4.50–5.00</span>
+    <span><span class="pill b-vg">Very Good</span> 4.00–4.49</span>
+    <span><span class="pill b-gd">Good</span> 3.00–3.99</span>
+    <span><span class="pill b-lo">Fair / Poor</span> below 3.00</span>
+    <span><span class="lowsample">LOW n</span> fewer than 5 evaluations</span>
+  </div>
+</section>
+
+<section class="grid2">
+  <div class="panel">
+    <div class="phead"><h2>Evaluations received</h2><p>Responses crediting each facilitator</p></div>
+    <div class="legend"><span><i style="background:var(--series)"></i>Named facilitator</span><span><i style="background:var(--team)"></i>Team Effort</span></div>
+    <svg class="chart" id="cCount" role="img" aria-label="Evaluations received per facilitator"></svg>
+  </div>
+  <div class="panel">
+    <div class="phead"><h2>Average rating</h2><p>Mean of all 15 criteria · dashed line = department average</p></div>
+    <div class="legend"><span><i style="background:var(--series);border-radius:50%"></i>Named facilitator</span><span><i style="background:var(--team);border-radius:50%"></i>Team Effort</span></div>
+    <svg class="chart" id="cAvg" role="img" aria-label="Average rating per facilitator"></svg>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="phead"><h2>Monthly activity</h2><p>Evaluations received per month · darker = more</p></div>
+  <div class="tscroll"><table class="heat" id="heat"></table></div>
+</section>
+
+<section class="panel" id="profile">
+  <div class="phead">
+    <h2 id="pTitle">Facilitator profile</h2>
+    <label class="ctl" for="facSel">Facilitator <select id="facSel"></select></label>
+  </div>
+  <div class="stats" id="pStats"></div>
+  <div class="detail">
+    <div>
+      <h3>Criteria scores vs department average</h3>
+      <div class="legend" style="margin-bottom:6px"><span><i style="background:var(--series);border-radius:50%"></i><span id="pLeg">Selected</span></span><span><i class="ring"></i>Department average</span></div>
+      <svg class="chart" id="cCrit" role="img" aria-label="Criteria scores"></svg>
+    </div>
+    <div style="display:grid;gap:14px;align-content:start;min-width:0">
+      <div><h3>Activities conducted</h3><ul class="list" id="pActs"></ul></div>
+      <div><h3>Worked with</h3><div class="chips" id="pCo"></div></div>
+      <div><h3>Stores represented</h3><div class="chips" id="pStores"></div></div>
+    </div>
+  </div>
+  <div class="grid2">
+    <div><h3>What participants found most valuable</h3><div class="quotes" id="pVal"></div></div>
+    <div><h3>Suggested improvements &amp; requested topics</h3><div class="quotes" id="pImp"></div></div>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="phead"><h2>Responses to review</h2><p>Average below 3.00 on the 15 criteria</p></div>
+  <div class="tscroll"><table id="lowT"></table></div>
+</section>
+
+<section class="panel notes">
+  <h2>How this report was built</h2>
+  <p><b>Source.</b> Figaro Culinary Group – Store Visit Evaluation Survey Form (RESPONSE), "Form responses 1" tab, <span id="nAll"></span> responses.</p>
+  <p><b>Name matching.</b> The Facilitator / Trainer field is free text, so spellings were grouped: "Sir Leo", "Leo Rey Fernandez", "loe", "lea" → Leo Fernandez; "Ver", "Jeliver", "Gerero" → Ver Guerrero; "Nika", "Nina" → Nica Tardio; "Anne", "an" → Ann Barredo; "Deniel", "Deleon" → Daniel De Leon; "Denis", "Denise" → Dennis; "Joshua" → Josh Earnshaw; "Rice" → Ricelle Lim. Sky, Dennis and Jov Palattao are listed as written in the responses.</p>
+  <p><b>Team Effort.</b> Entries with no individual name ("Training Department", "Trainer", "Facilitator", "Training Room", "Trainee", "?", "Good", a store or other department name, or unrelated text) are credited to Team Effort.</p>
+  <p><b>Shared sessions.</b> When a response names several facilitators, each one receives full credit for that response. Because of this, facilitator totals add up to more than the number of responses.</p>
+  <p><b>KPIs.</b> Average rating = mean of all 15 items. Delivery = objectives, expertise, organization, questions answered, participation. Content = relevance, practical examples, knowledge gained, operational improvement. Impact = the six learning-impact statements. Satisfaction = share rating 4 or 5 on "Overall, I am satisfied with the activity".</p>
+  <p><b>Data fixes.</b> Three activity dates were invalid (08/06/2026, 03/09/0026, 11/07/2000) and were replaced with the submission date. Six responses with a blank or unclear activity were assigned the activity recorded at the same store or by the same facilitator that day.</p>
+  <p><b>Scale misreads.</b> <span id="revNote"></span></p>
+</section>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+const DATA = {"items":["Objectives were clearly communicated","Content was relevant to my job","Facilitator demonstrated expertise","Activity was organized and easy to understand","Examples and coaching were practical","Questions were addressed effectively","Activity enhanced my knowledge and skills","Activity contributes to improved operations","Facilitator encouraged participation","Overall, I am satisfied with the activity","I gained new knowledge and insights.","I can immediately apply what I learned.","The activity addressed actual operational challenges.","Coaching and feedback were beneficial.","The activity motivated me to improve performance."],"recs":[{"date":"2026-07-08","brand":"Angel's Pizza","store":"BALIUAG","pos":"Shift Manager","cat":"Refresher / Coaching / Corrective Action","fac":["Nica Tardio","Alliana (Yana) Papa"],"s":[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],"val":"When they share knowledge and correctives to us","imp":"None, all they've said is helpful","top":"None"},{"date":"2026-07-10","brand":"Angel's Pizza","store":"ANABU","pos":"Shift Manager","cat":"Store Visit","fac":["Leo Fernandez"],"s":[5,5,5,5,5,5,5,4,5,5,4,4,4,4,4],"val":"Always updated","imp":"Rox improvement t","top":"Shellife"},{"date":"2026-07-15","brand":"Angel's Pizza","store":"BALIUAG","pos":"Cashier","cat":"Barista & Coffee Bar Training","fac":["Ver Guerrero"],"s":[4,4,4,4,4,4,4,4,4,4,4,4,4,4,4],"val":"Latte art","imp":"Bar","top":"Latte art"},{"date":"2026-07-15","brand":"Angel's Pizza","store":"BALIUAG","pos":"Service","cat":"Barista & Coffee Bar Training","fac":["Ver Guerrero"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"about all procedures and maintenance of coffee machines","imp":"nothing","top":"nothing"},{"date":"2026-07-15","brand":"Angel's Pizza","store":"BALIUAG","pos":"Barista","cat":"Barista & Coffee Bar Training","fac":["Ver Guerrero"],"s":[5,5,5,4,5,5,5,5,5,5,5,5,5,5,5],"val":"Presentation","imp":"Demonstration","top":"Latte art"},{"date":"2026-07-15","brand":"Angel's Pizza","store":"BGC","pos":"Team Leader","cat":"Refresher / Coaching / Corrective Action","fac":["Sky"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"1 on 1 talking","imp":"Kitchen area","top":"Sop practices / standards"},{"date":"2026-07-15","brand":"Angel's Pizza","store":"TUGUEGARAO","pos":"Food Prep","cat":"Refresher / Coaching / Corrective Action","fac":["Leo Fernandez","James Nacionales"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,4,5],"val":"About the ROX","imp":"Kitchen","top":"About the expiration of the product"},{"date":"2026-07-15","brand":"Angel's Pizza","store":"TUGUEGARAO","pos":"Service","cat":"Refresher / Coaching / Corrective Action","fac":["Leo Fernandez","James Nacionales"],"s":[5,5,4,5,4,5,5,5,5,5,5,5,4,3,5],"val":"N/A","imp":"Dine in","top":"N/A"},{"date":"2026-07-15","brand":"Angel's Pizza","store":"TUGUEGARAO","pos":"Team Leader","cat":"Refresher / Coaching / Corrective Action","fac":["Leo Fernandez","James Nacionales"],"s":[5,5,5,5,5,5,5,5,5,4,5,5,4,4,5],"val":"Explain about rox","imp":"Rox","top":"Good leader"},{"date":"2026-07-16","brand":"Angel's Pizza","store":"CAUAYAN","pos":"Store Manager","cat":"Refresher / Coaching / Corrective Action","fac":["James Nacionales"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Proper standard","imp":"N/a","top":"Food safety training"},{"date":"2026-07-19","brand":"Angel's Pizza","store":"SANTIAGO","pos":"Rider","cat":"Store Visit","fac":[],"s":[2,1,3,5,3,2,5,5,5,3,3,2,2,2,2],"val":"?","imp":"?","top":"?"},{"date":"2026-07-19","brand":"Angel's Pizza","store":"SANTIAGO","pos":"Team Leader","cat":"Store Visit","fac":["Leo Fernandez","James Nacionales"],"s":[5,4,5,5,5,5,5,5,5,5,5,5,5,4,4],"val":"For improvement","imp":"Backdoor and labelling","top":"For the improvement of food products and more topics about the standard of labelling"},{"date":"2026-07-19","brand":"Angel's Pizza","store":"SANTIAGO","pos":"Service","cat":"Store Visit","fac":[],"s":[4,4,4,4,4,3,4,4,4,4,4,4,4,4,4],"val":"Value customer","imp":"Kitchen","top":"In kitchn"},{"date":"2026-07-19","brand":"Angel's Pizza","store":"SANTIAGO","pos":"Team Leader","cat":"Food Safety","fac":["Jov Palattao"],"s":[4,5,5,5,4,4,5,5,5,5,4,5,5,5,4],"val":"food safety","imp":"all","top":"food safety"},{"date":"2026-07-23","brand":"Tien Ma's","store":"TIEN MAS SAN FERNANDO","pos":"Management Trainee","cat":"TM Service Steps Training","fac":["Daniel De Leon"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"How we able to provide customer satisfaction","imp":"None","top":"How they will able to provide insights and step how to improve"},{"date":"2026-07-23","brand":"Tien Ma's","store":"TIEN MAS RETIRO","pos":"Service Staff","cat":"TM Service Steps Training","fac":["Daniel De Leon"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"12 steps","imp":"12 steps kailangab mas aralin pa at maging consistency.","top":"12 steps"},{"date":"2026-07-23","brand":"Tien Ma's","store":"TIEN MAS ANTIPOLO","pos":"Service Staff","cat":"TM Service Steps Training","fac":["Daniel De Leon"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Excellent service","imp":"how to handling proper customer","top":"customer service, consistency"},{"date":"2026-07-23","brand":"Tien Ma's","store":"TIEN MAS ANTIPOLO","pos":"Shift Manager","cat":"TM Service Steps Training","fac":["Daniel De Leon"],"s":[5,5,4,4,4,4,4,5,5,4,3,4,4,4,4],"val":"Customer Satisfaction (role play)","imp":"All service steps","top":"Customer complaints"},{"date":"2026-07-23","brand":"Tien Ma's","store":"TIEN MAS WM NORTH","pos":"Mt","cat":"TM Service Steps Training","fac":["Daniel De Leon"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Service steps","imp":"Wala na po","top":"None"},{"date":"2026-07-23","brand":"Tien Ma's","store":"TIEN MAS RETIRO","pos":"Mt","cat":"TM Service Steps Training","fac":[],"s":[5,5,5,4,5,4,5,4,5,5,5,5,5,5,5],"val":"Lahat","imp":"Lahat","top":".."},{"date":"2026-07-23","brand":"Tien Ma's","store":"TIEN MAS SAN FERNANDO","pos":"Cashier","cat":"TM Service Steps Training","fac":["Daniel De Leon"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Lahat","imp":"More improvement sa serving","top":"More knowledge"},{"date":"2026-07-23","brand":"Tien Ma's","store":"TIEN MAS MORIONES","pos":"Service","cat":"TM Service Steps Training","fac":["Daniel De Leon"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"To upsell and push all the item","imp":"Maipaliwanag naman po ng maayos","top":"Yung pag babago"},{"date":"2026-07-23","brand":"Tien Ma's","store":"TIEN MAS WM NORTH","pos":"Service Staff","cat":"TM Service Steps Training","fac":["Daniel De Leon"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"lahat po ng natalakay","imp":"naipaliwanag po ng maayos Ang lahat. natalakay po Ang mga dapat na matalakay","top":"natalakay pong LAHAT"},{"date":"2026-07-23","brand":"Tien Ma's","store":"TIEN MAS SOUTH PARK","pos":"Mt","cat":"TM Service Steps Training","fac":["Daniel De Leon"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Ang pinakamahalagang bahagi para sa akin ay ang mga actual na halimbaw at mga bagong strategy na itinuro na magagamit ko sa aking pang-araw-araw na trabaho masnadagdagan ang kaalaman.","imp":"sa tingin ko po maayos at organisado ang buong aktibidad, wala akong nakikitang kailangang baguhin.","top":"wala napo"},{"date":"2026-07-24","brand":"Tien Ma's","store":"TIEN MAS SOUTH PARK","pos":"Store Head","cat":"TM Service Steps Training","fac":["Daniel De Leon"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"lahat po","imp":"lahat po ng diniscuss sa training","top":"lahat po"},{"date":"2026-07-24","brand":"Tien Ma's","store":"TIEN MAS ANTIPOLO","pos":"Mt","cat":"TM Service Steps Training","fac":["Daniel De Leon"],"s":[5,5,4,5,5,5,5,5,5,5,5,5,4,5,5],"val":"Proper sequence of service","imp":"None","top":"None"},{"date":"2026-07-24","brand":"Tien Ma's","store":"TIEN MAS MORIONES","pos":"Store Head","cat":"TM Service Steps Training","fac":["Daniel De Leon"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Role play","imp":"More training","top":"Training about managerial position"},{"date":"2026-07-24","brand":"Tien Ma's","store":"TIEN MAS RETIRO","pos":"Server","cat":"TM Service Steps Training","fac":["Daniel De Leon"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"The 12 service steps","imp":"Focus on the service step","top":"how to handle difficult customers"},{"date":"2026-07-24","brand":"Tien Ma's","store":"TIEN MAS MAKATI","pos":"Service","cat":"TM Service Steps Training","fac":["Daniel De Leon"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Interact with customers","imp":"12 step","top":"Check back / suggestive selling"},{"date":"2026-07-24","brand":"Tien Ma's","store":"TIEN MAS SAN FERNANDO","pos":"Service","cat":"TM Service Steps Training","fac":[],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Suggestions for customer","imp":"Mabuti","top":"Nothing"},{"date":"2026-07-24","brand":"Tien Ma's","store":"TIEN MAS WM NORTH","pos":"Cashier","cat":"TM Service Steps Training","fac":["Daniel De Leon"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Role playing","imp":"Role play","top":"Customer service"},{"date":"2026-07-24","brand":"Tien Ma's","store":"TIEN MAS SAN FERNANDO","pos":"Am","cat":"TM Service Steps Training","fac":["Daniel De Leon"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"12 service steps","imp":"Activities","top":"Management development."},{"date":"2026-07-25","brand":"Figaro","store":"SANTA MARIA","pos":"Barista","cat":"Refresher / Coaching / Corrective Action","fac":["Ver Guerrero"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Refresher","imp":"Na","top":"Na"},{"date":"2026-07-25","brand":"Figaro","store":"SANTA MARIA","pos":"Cashier","cat":"Refresher / Coaching / Corrective Action","fac":["Ver Guerrero"],"s":[4,5,4,5,5,5,5,5,5,5,5,5,5,5,5],"val":"All of the activities","imp":"Bar refresher. Drinks improvement","top":"More refresher"},{"date":"2026-07-25","brand":"Figaro","store":"SANTA MARIA","pos":"Food Prep","cat":"Refresher / Coaching / Corrective Action","fac":["Ver Guerrero"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Food prep guide","imp":"N/a","top":"N/A"},{"date":"2026-07-30","brand":"Angel's Pizza","store":"METROPLAZA","pos":"Area Manager","cat":"Professional Image Enhancement","fac":["Ann Barredo","Sky"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"All","imp":"Improvement confident and professionalism","top":"Work Ethic"},{"date":"2026-07-30","brand":"Angel's Pizza","store":"SAN PABLO","pos":"Customer Service Representative","cat":"Professional Image Enhancement","fac":["Ann Barredo","Sky"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"The whole seminar","imp":"more fun activities","top":"How to handle customers, store problems, etc."},{"date":"2026-07-30","brand":"Angel's Pizza","store":"SAN PABLO","pos":"Manager","cat":"Professional Image Enhancement","fac":["Nica Tardio","Ann Barredo"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Work Ethic","imp":"N A","top":"More of connected to this topic for front-of-the-house"},{"date":"2026-07-30","brand":"Angel's Pizza","store":"LOS BANOS","pos":"Cashier","cat":"Professional Image Enhancement","fac":[],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Ang pagiging behavior","imp":"Gawing tama at maayos ang tinuturo","top":"Mas ma enhance pa ang behavior ng bawat isa"},{"date":"2026-07-30","brand":"Angel's Pizza","store":"BEL AIR LAGUNA","pos":"Service","cat":"Professional Image Enhancement","fac":["Nica Tardio","Ann Barredo"],"s":[5,5,5,5,5,3,5,5,5,5,5,5,5,5,5],"val":"Being professional on work","imp":"customer Service","top":"Audit Deviations"},{"date":"2026-07-30","brand":"Angel's Pizza","store":"NOVALICHES","pos":"Cashier","cat":"Professional Image Enhancement","fac":["Sky"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Communicate","imp":"Na","top":"Na"},{"date":"2026-07-30","brand":"Angel's Pizza","store":"BERKELEY","pos":"Pizza Maker","cat":"Professional Image Enhancement","fac":["Sky"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Cguro po ung sa work ethic","imp":"Wala nmn po need i improved kasi maayos nmn po lahat","top":"Ok nm po lahat"},{"date":"2026-07-30","brand":"Angel's Pizza","store":"NOVALICHES","pos":"Shift Manager","cat":"Professional Image Enhancement","fac":["Ann Barredo","Sky"],"s":[4,4,5,5,4,4,4,4,4,4,5,4,4,4,4],"val":"Ma enhance yung confidence namin as a leader","imp":"Wala naman po","top":"Sa Apc card , kung ganun pa din yung price 299"},{"date":"2026-07-30","brand":"Angel's Pizza","store":"STA.ROSA","pos":"Mt Manager","cat":"Professional Image Enhancement","fac":["Ann Barredo","Sky"],"s":[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],"val":"Work ethic","imp":"Hygiene ang physical appearance","top":"Work ethic and physical appearance"},{"date":"2026-07-30","brand":"Angel's Pizza","store":"GUAGUA","pos":"Cashier","cat":"Professional Image Enhancement","fac":["Nica Tardio","Ann Barredo"],"s":[5,5,5,5,5,5,5,1,5,5,5,5,5,5,5],"val":"Body languange Mistakes , Bad Mannerism and Personal Images","imp":"Sa Kitchen Areas po","top":"About Sa Kitchen Area po"},{"date":"2026-07-30","brand":"Angel's Pizza","store":"METROPLAZA","pos":"Mt","cat":"Professional Image Enhancement","fac":["Ann Barredo","Sky"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Importance of profesional image","imp":"How to handle irrate customer/ dillusional customer.","top":"N/A"},{"date":"2026-07-30","brand":"Angel's Pizza","store":"BERKELEY","pos":"Csr","cat":"Professional Image Enhancement","fac":["Sky"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"gromming and be professional","imp":"maging maayos sa pananamit at sa maging professional","top":"be pancual be honest"},{"date":"2026-07-30","brand":"Angel's Pizza","store":"LOS BANOS","pos":"Shift Manager","cat":"Professional Image Enhancement","fac":["Ann Barredo","Sky"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Physical space","imp":"Proper communication with your people, boundaries with your staff and time management","top":"How to be confident with your self"},{"date":"2026-07-30","brand":"Angel's Pizza","store":"GUAGUA","pos":"Shift Manager","cat":"Professional Image Enhancement","fac":[],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Para sa akin, ang pinakamahalagang bahagi ng isang aktibidad ay ang paglalapat ng teorya sa praktikal na sitwasyon (hands-on application).Narito ang mga dahilan kung bakit ito ang pinaka-kapaki-pakinabang:Aktibong Pagkatuto: Mas madaling maunawaan ang isang konsepto kapag aktuwal itong ginagawa kaysa binabasa lamang.Pagbuo ng Solusyon: Dito nasusubok ang kritikal na pag-iisip sa pamamagitan ng paglutas sa mga totoong problema.Agarang Feedback: Nakikita agad kung aling bahagi ang nagawa nang tama at alin ang kailangang ayusin.Kumpiyansa: Ang pagtatapos ng isang praktikal na gawain ay nagbibigay ng tiwala sa sarili na kayang ulitin ang proseso sa hinaharap.","imp":"Pamamahala ng Oras (Time Management)Pagsunod sa Iskedyul: Simulan at tapusin ang bawat bahagi sa tamang oras.Sapat na Pahinga: Maglaan ng sapat na break para hindi mapagod ang mga kalahok.Alokasyon ng Oras: Lakihan ang oras sa mga praktikal na pagsasanay kaysa sa lektyur.","top":"Narito ang mga mahahalagang paksa sa pagsasanay at pagpapaunlad (Training & Development) na maaaring isagawa para sa mga susunod na programa, na hinati base sa pangangailangan ng organisasyon:1. Kakayahang Pamumuno (Leadership & Management)Strategic Leadership: Paggawa ng mga pangmatagalang desisyon at plano para sa kumpanya.Change Management: Paggabay sa mga empleyado sa panahon ng transisyon o pagbabago sa organisasyon.People Management & Coaching: Tamang pagganyak, pag-evaluate, at pagpapatakbo ng isang koponan."},{"date":"2026-07-30","brand":"Angel's Pizza","store":"SAN PASCUAL","pos":"Mt","cat":"Professional Image Enhancement","fac":["Ann Barredo","Sky"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Work ethic","imp":"Body language mistake","top":"Yung mga mahahalagang bahay na makakatulong sa Amin bilang Isang staff"},{"date":"2026-07-30","brand":"Angel's Pizza","store":"BEL AIR LAGUNA","pos":"Shift Manager","cat":"Professional Image Enhancement","fac":["Nica Tardio","Ann Barredo"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"The most valuable that I find this training is to be more professional at all the time","imp":"None/well explained","top":"Maybe the next training will be the \"Pointing of Audit\" to discuss all the major deviation"},{"date":"2026-07-30","brand":"Angel's Pizza","store":"CAMARIN","pos":"Assistant Area Manager","cat":"Professional Image Enhancement","fac":["Ann Barredo","Sky"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Learning deeply about work ethic","imp":"More engaging activity like we did today","top":"About Customer complain"},{"date":"2026-07-30","brand":"Angel's Pizza","store":"CALAMBA","pos":"Cashier","cat":"Professional Image Enhancement","fac":["Ann Barredo","Sky"],"s":[5,5,5,5,5,5,5,5,4,5,4,5,4,5,4],"val":"Lahat naman po nakakapagbibay samin ng halaga at pakinabang sa araw araw naming trabaho.","imp":"Proper Grooming, always smile, and maapply lahat ng mga natutunan dito sa Training Seminar Professional Image Enhancement","top":"Wala naman po. Over all ok naman yung discussion, naintindihan din po ng maayos."},{"date":"2026-07-30","brand":"Angel's Pizza","store":"CALAMBA","pos":"Manager","cat":"Professional Image Enhancement","fac":["Ann Barredo","Sky"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Lahat","imp":"Lahat","top":"Lahat"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"UN AVE SHELL","pos":"Delivery Rider","cat":"Rider Refresher & Mobile App","fac":["Leo Fernandez","Alex Rivera","Dennis"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"ap mobile app","imp":"none","top":"pag papadali at pag huhusay sa mga delivery rider"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"SILANG","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera","Dennis"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Mga bagong information tungkol sa app","imp":"Wala na","top":"Madami"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"COGEO","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Leo Fernandez","Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"All","imp":"None","top":"Very good"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"PASIG","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Leo Fernandez","Alex Rivera","Dennis"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Refresher exam","imp":"Mobile app and refresher","top":"Para po sa rider"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"MCKINLEY","pos":"Pizzamaker/Rider","cat":"Rider Refresher & Mobile App","fac":["Leo Fernandez","Alex Rivera","Dennis"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"n/a","imp":"N/A","top":"N/A"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"ANTIPOLO","pos":"Delivery Rider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera","Dennis"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Rider refresher and mobile apps","imp":"Lubos pa maunahawan ung mobile apps","top":"About sa mobile apps nlang po"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"GENTRI","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Leo Fernandez","Alex Rivera","Dennis"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Mga bagong information tungkol sa apps .","imp":"Wala na","top":"Marami"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"BGC","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Leo Fernandez","Alex Rivera","Dennis"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"N/A","imp":"N/A","top":"N/A"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"ORTIGAS","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera","Dennis"],"s":[3,4,4,4,4,4,4,4,4,4,4,4,4,4,4],"val":"customer service","imp":"none","top":"none"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"ALMANZA","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Leo Fernandez","Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Sa part ng discussion of delivery specialist","imp":"Discussion","top":"Roleplay of Gtit"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"SAN MATEO","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Leo Fernandez","Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"The new mobile app","imp":"Almost ok naman lahat more power to all","top":"The new mobile app"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"DASMA","pos":"Delivery Rider","cat":"Rider Refresher & Mobile App","fac":["Leo Fernandez","Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Lahat po ng naganap ngayong araw","imp":"Mobile app","top":"Mobile app"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"V MAPA","pos":"Dtl Rider","cat":"Rider Refresher & Mobile App","fac":["Leo Fernandez","Alex Rivera","Dennis"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Lahat","imp":"Yes","top":"N/A"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"DONA SOLEDAD","pos":"Delivery Rider","cat":"Rider Refresher & Mobile App","fac":["Leo Fernandez","Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Ung apps sa phone","imp":"Ung lalabas na apps","top":"Ung bagong apps"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"BINONDO","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Leo Fernandez","Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Dagdag kaalaman para saking trabaho at mobile app","imp":"dagdag.kaalaman sa pag seserbisyo","top":"dagdag kaalaman papo tungkol sa mobile app"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"SUCAT","pos":"Delivery Rider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"demonstrate","imp":"trainer","top":"duties and responsibility"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"TALABA","pos":"Team Leader Rider","cat":"Rider Refresher & Mobile App","fac":["Leo Fernandez","Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Rider Refresher","imp":"Mobile apps","top":"N/a"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"MONUMENTO","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Leo Fernandez","Alex Rivera","Dennis"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"refresher","imp":"mobile app","top":"refresher"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"WESTDRIVE","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Leo Fernandez","Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Tamang trato sa kapwa","imp":"N/a","top":"N/A"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"KALAYAAN","pos":"Tl Rider","cat":"Rider Refresher & Mobile App","fac":["Leo Fernandez","Alex Rivera","Dennis"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Refresher","imp":"Refresher","top":"Refresher"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"BACOOR","pos":"Duty Teamleader","cat":"Rider Refresher & Mobile App","fac":["Leo Fernandez","Alex Rivera"],"s":[4,4,4,4,4,4,4,4,4,4,4,4,4,4,4],"val":"Rider Refreshing","imp":"Rider refresher","top":"Rider refresher"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"PRIMARK","pos":"Dtl","cat":"Rider Refresher & Mobile App","fac":["Leo Fernandez","Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Costumer service","imp":"Performing other duties","top":"Give a high performance to the company"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"MALABON","pos":"Delivery Rider","cat":"Rider Refresher & Mobile App","fac":["Leo Fernandez","Alex Rivera","Dennis"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Good delivery","imp":"Speed of delivery","top":"Speed delivery"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"IMUS","pos":"Rider Refresher","cat":"Rider Refresher & Mobile App","fac":["Leo Fernandez","Alex Rivera","Dennis"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Na irefresh","imp":"Na irefresh","top":"Konting ayos pa"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"TIMOG","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Leo Fernandez","Alex Rivera","Dennis"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Lahat ng paksa","imp":"Anything about all positions","top":"Anything"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"MAKATI","pos":"Raider","cat":"Rider Refresher & Mobile App","fac":["Leo Fernandez","Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"N/a","imp":"N/a","top":"N/a"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"BINANGONAN","pos":"Delivery Rider","cat":"Rider Refresher & Mobile App","fac":["Leo Fernandez","Alex Rivera"],"s":[5,5,5,4,4,4,4,5,5,5,5,4,4,4,4],"val":"we earn points","imp":"improve the things we need","top":"mas mapag tuunan sana yun mga motorbike."},{"date":"2026-08-06","brand":"Angel's Pizza","store":"ANABU","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Leo Fernandez","Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Na refresh","imp":"Kung paano maayos ung mapadali","top":"nadagdag ng kaalaman"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"HOLY SPIRIT","pos":"Delivery Rider","cat":"Rider Refresher & Mobile App","fac":["Leo Fernandez","Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Ung pinaliwanag samen kong papaano gamitin ang mobile app","imp":"Wala po Ako maisip sorry po","top":"Ok nmn po lahat"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"SANDOVAL","pos":"Dilivery Rider","cat":"Rider Refresher & Mobile App","fac":["Leo Fernandez","Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Lahat ng lesson","imp":"Wala na masabi","top":"Wala na din po"},{"date":"2026-08-06","brand":"Angel's Pizza","store":"SAN SEBASTIAN","pos":"Delivery Rider","cat":"Rider Refresher & Mobile App","fac":["Leo Fernandez","Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Pag alalabsa mga Gawain","imp":"Ang pagbabahagi ng kaalaman sa katrabaho","top":"Pagpapalawak ng kaalaman patungkol sa mga gawaing makakatulong sa pagpapabilis ng serbisyo ng delivery.."},{"date":"2026-08-08","brand":"Figaro","store":"TACLOBAN","pos":"Service Staff","cat":"Technical Validation & Evaluation","fac":["Ver Guerrero"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Technical examination","imp":"Demonstrate the actual procedure per station","top":"More Actual procedure"},{"date":"2026-08-08","brand":"Figaro","store":"TACLOBAN","pos":"Barista","cat":"Technical Validation & Evaluation","fac":["Ver Guerrero"],"s":[4,4,4,4,4,4,4,4,4,4,4,4,4,4,4],"val":"Making coffee","imp":"Every area can be improve in the future activities .","top":"For now, i just want to focus in the bar area and making good coffee"},{"date":"2026-08-05","brand":"Figaro","store":"TACLOBAN","pos":"Store Manager","cat":"Technical Validation & Evaluation","fac":["Ver Guerrero"],"s":[4,4,5,4,4,5,5,4,4,4,4,4,4,4,4],"val":"The practical hand on tasks,experts guidance and the peer teamwork.","imp":"Focus on upgrading key operational areas like communication time management, organization and feedback collection.","top":"Artificial intelligence and digital tools for daily work stand out as a high value future topic."},{"date":"2026-08-08","brand":"Figaro","store":"TACLOBAN","pos":"Oic","cat":"Technical Validation & Evaluation","fac":["Ver Guerrero"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Lahat naman po","imp":"Lahat po","top":"Lahat po"},{"date":"2026-08-08","brand":"Figaro","store":"TACLOBAN","pos":"Cashier","cat":"Technical Validation & Evaluation","fac":["Ver Guerrero"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"How to deal with customers.","imp":"Improve better communication and more organized scheduling","top":"I would like more training communication and teamwork."},{"date":"2026-08-08","brand":"Figaro","store":"TACLOBAN","pos":"Cashier","cat":"Technical Validation & Evaluation","fac":["Ver Guerrero"],"s":[5,5,4,4,4,5,5,5,4,5,5,5,4,5,5],"val":"Yung standard na Pag operation","imp":"Isa Ulo ang mga tinuturo","top":"More knowledge pa about sa store"},{"date":"2026-08-08","brand":"Figaro","store":"TACLOBAN","pos":"Food Prep","cat":"Technical Validation & Evaluation","fac":["Ver Guerrero"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"more experiences .","imp":"Sundan ang mga standard upang maging improved and ginawa at naging maayos.","top":"gusto ko ay pag gawa nang sauces, mahirap na nakapag enjoy."},{"date":"2026-08-11","brand":"Angel's Pizza","store":"MAYON","pos":"Stock Clerk","cat":"Training Documentation Notice","fac":[],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"all of it.","imp":"none, because all of the trainer's executed the training orientation very well.","top":"all of it."},{"date":"2026-08-11","brand":"Angel's Pizza","store":"BERKELEY","pos":"Cashier","cat":"Orientation","fac":[],"s":[4,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Code of conduct and proper uniform","imp":"N/A","top":"Importantance of cleanliness"},{"date":"2026-08-11","brand":"Angel's Pizza","store":"MAYON","pos":"Warehouse & Logistic Driver","cat":"Orientation","fac":["James Nacionales"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Code of conduct","imp":"Mga produkto ng kompanya","top":"Wala na"},{"date":"2026-08-11","brand":"Angel's Pizza","store":"PRIMARK","pos":"Cashier","cat":"Orientation","fac":[],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Honesty","imp":"Explain properly","top":"Dismisal"},{"date":"2026-08-11","brand":"Angel's Pizza","store":"MAYON","pos":"Production","cat":"Orientation","fac":[],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Malaki ang naitulong ng pagtalakay sa mga totoong sitwasyon upang mas malalim kong maintindihan ang paksa at magamit ko ito sa aking gawain.","imp":"Makakatulong din ang pagbibigay ng mas maraming halimbawa at pag-aaral ng mga totoong kaso upang mas madaling maintindihan","top":"Magiging kapaki-pakinabang din ang mga paksa tungkol sa wastong asal sa trabaho, at kung paano haharapin ang iba’t ibang sitwasyon sa paggawa."},{"date":"2026-08-11","brand":"Angel's Pizza","store":"MAYON","pos":"Logistic","cat":"Orientation","fac":[],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Disciplinary action8","imp":"Cooperation","top":"Honesty"},{"date":"2026-08-11","brand":"Angel's Pizza","store":"MAYON","pos":"Production","cat":"Orientation","fac":[],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Lahat po ng aktibidad ay kapaki pakinabang para saakin para matulungan ako sa pagsisimula sa aking bagong trabaho","imp":"Para po saakin wala na po dahil nasa maayos na po na nagagawa ito","top":"Lahat po dahil makakatulong po ito sa pag sisimula ng bagong trabaho"},{"date":"2026-08-11","brand":"Angel's Pizza","store":"MAYON","pos":"Pruduction Staff (Tien Ma'S)","cat":"Orientation","fac":[],"s":[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],"val":"respeto,anes,","imp":"new skill","top":"maayos na pamamaraan"},{"date":"2026-08-11","brand":"Angel's Pizza","store":"MAYON","pos":"Production Staff","cat":"Orientation","fac":[],"s":[5,5,5,5,5,5,5,5,4,5,5,5,4,5,5],"val":"Dishonesty","imp":"Sana matoto nang mabuti","top":"Makapag trabaho nang maayos."},{"date":"2026-08-11","brand":"Angel's Pizza","store":"MAYON","pos":"Production Staff","cat":"Orientation","fac":[],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"honestmaayos","imp":"kaayusan","top":"maturuan kami ng tama"},{"date":"2026-08-11","brand":"Angel's Pizza","store":"MAYON","pos":"Production (Tien Ma'S)","cat":"Orientation","fac":[],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Dishonesty. Ito po yung napakapagbigay linaw sa akin at nagbigay ng kapaki-pakinabang na aktibidad dahil dito po naipapakita kung gaano kahalaga sa kompanya ang pagiging tapat ng isang empleyado. Sa pamamagitan po ng pagiging tapat ay naipapakita at nakukuha natin ang respeto hindi lang sa kung sino ang kausap natin kundi mula sa kompanyang pinagtatrabahuhan natin.","imp":"Para sa akin po ay wala na. Dahil malinaw po itinalakay ng tagapagturo ang bawat aktibidad sa amin.","top":"Wala po. Dahil lahat po ng aktibidad na tinalakay sa amin ay makakatulong at magagamit po namin hindi lang po sa trabaho kundi magagamit at makakatulong din sa aming mga sarili."},{"date":"2026-08-11","brand":"Angel's Pizza","store":"MAYON","pos":"Production","cat":"Orientation","fac":[],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Ang pinakamagandang bahagi para sa akin ay ang pagbabahagi ng mga kaalaman at karanasan Ng acting tagapagsalita","imp":"Mas maayos po Kong magpapakita Ng mga video at actual na produksyon para mas madali naming masundan ang tamang hakbang sa paggawa","top":"3. Nais ko po sanang magsagawa ang Training Department ng pagsasanay tungkol sa mga tamang hakbang na dapat gawin kapag hindi sinasadyang nalabag ang isang patakaran."},{"date":"2026-08-12","brand":"Figaro","store":"ASSUMPTION","pos":"Fnb","cat":"Barista & Coffee Bar Training","fac":["Ver Guerrero"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Pag timpla ng ibat ibang timplang kape","imp":"Pagtimpla ng Cafe latte","top":"Panibagong timplang coffee frappe"},{"date":"2026-08-12","brand":"Figaro","store":"ASSUMPTION","pos":"Fnb","cat":"Barista & Coffee Bar Training","fac":["Ver Guerrero"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Pag hands on sa machine, paano kuhanin ang tamang sukat para makuha ang kalidad ng output/ produkto upang mahikayat lalo ang costumer.","imp":"Gusto ko pang mapabuti ang kaalaman kung paano gumawa ng art or pagdiseniyo sa kape.","top":"Panibagong diskubre, or something thrill / kakaiba sa pandinig at sa panigin. Just to improve the quality and quantity to provide new discover with the company"},{"date":"2026-08-12","brand":"Figaro","store":"ASSUMPTION","pos":"Fnb","cat":"Barista & Coffee Bar Training","fac":["Ver Guerrero"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"How to make coffe","imp":"How to make latte art","top":"How to make more coffe"},{"date":"2026-08-18","brand":"Angel's Pizza","store":"MALATE","pos":"Rider","cat":"Orientation","fac":[],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Basic Behavioral","imp":"Customer service","top":"Customer Service"},{"date":"2026-08-18","brand":"Angel's Pizza","store":"MAYON","pos":"Production Staff","cat":"Orientation","fac":[],"s":[5,5,5,5,5,5,5,5,5,5,5,4,5,5,5],"val":"Ang Rules and Regulations, Code of Conduct","imp":"Wala na dahil natalakay naman ng maayos ang lahat ng mga training mentor at napaliwanag ng maayos.","top":"Sa akin palagay ay kumpleto na ang programa dahil naipapaliwanag naman ng maayos ng mga training mentor ang mga dapat malaman ng mga traineer about sa Kompanya"},{"date":"2026-08-18","brand":"Figaro","store":"F DASMA","pos":"Kitchen Staff","cat":"Orientation","fac":[],"s":[4,5,5,5,5,5,5,5,5,4,5,5,5,5,5],"val":"Training flow","imp":"Company rules regulation,","top":"Barista"},{"date":"2026-08-18","brand":"Angel's Pizza","store":"PRIMARK","pos":"Cashier","cat":"Orientation","fac":[],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Training flow","imp":"Company Rules","top":"Food Server"},{"date":"2026-08-18","brand":"Angel's Pizza","store":"MALATE","pos":"Delivery Rider","cat":"Orientation","fac":[],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Basic behavioral module","imp":"Costumer service","top":"Costumer service"},{"date":"2026-08-18","brand":"Angel's Pizza","store":"MAKATI","pos":"Rider","cat":"Orientation","fac":[],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Responsibility ang professionalism","imp":"Good moral and right conduct","top":"Act legendary"},{"date":"2026-08-18","brand":"Angel's Pizza","store":"MAYON","pos":"Production Staff/Tm","cat":"Orientation","fac":[],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"As a trainee, it is the basic behavioral topic. Because it teaches me how to be a good employee, to be obedient to the rules and regulations, to be kind to my co-employee while preparing myself to be a regular employee.","imp":"I think the topics that has nothing to do with my position or department.","top":"The basic behavioral topic which is the most important topic for me."},{"date":"2026-08-18","brand":"Angel's Pizza","store":"VALENZUELA","pos":"Rider","cat":"Orientation","fac":[],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Responsibility and professionalism","imp":"Goodmoral","top":"Costumer service"},{"date":"2026-08-24","brand":"Angel's Pizza","store":"KABIHASNAN","pos":"Rider","cat":"Orientation","fac":[],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Lahat ng aktibidad","imp":"Lahat","top":"Lahat po ng nattunan"},{"date":"2026-08-26","brand":"Tien Ma's","store":"TIEN MAS ANTIPOLO","pos":"Server/Cashier","cat":"TM Service Steps Training","fac":["Nica Tardio"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Service steps","imp":"Kung paano magkaron ng excellent service","top":"Lahat naman po ay maayos.Thank you"},{"date":"2026-08-26","brand":"Tien Ma's","store":"TIEN MAS ANTIPOLO","pos":"Store Manager","cat":"TM Service Steps Training","fac":["Nica Tardio","Daniel De Leon"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"All the above","imp":"Wala po","top":"Handling customer feedback and customer satisfaction"},{"date":"2026-08-26","brand":"Tien Ma's","store":"TIEN MAS MAKATI","pos":"Cashier","cat":"TM Service Steps Training","fac":["Nica Tardio","Daniel De Leon"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Service step","imp":"Custom service","top":"Customer service"},{"date":"2026-08-26","brand":"Tien Ma's","store":"TIEN MAS MORIONES","pos":"Manager","cat":"TM Service Steps Training","fac":["Sky","Daniel De Leon"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"The service steps","imp":"Customer service","top":"More knowledgable on hospitality"},{"date":"2026-08-26","brand":"Tien Ma's","store":"TIEN MAS MAKATI","pos":"Manager","cat":"TM Service Steps Training","fac":["Sky","Daniel De Leon"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"lahat nang na cascade about training lahat ay kapikapinabang","imp":"nothing all topics training has very good report","top":"Nothing All topic is easy to understand Very good reporting"},{"date":"2026-08-26","brand":"Tien Ma's","store":"TIEN MAS SOUTH PARK","pos":"Service Staff","cat":"TM Service Steps Training","fac":["Nica Tardio","Daniel De Leon"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Lahat","imp":"Role play Materials","top":"None for now"},{"date":"2026-08-28","brand":"Angel's Pizza","store":"SUCAT","pos":"Shift Manager","cat":"Technical Validation & Evaluation","fac":["Nica Tardio","Ricelle (Rice) Lim"],"s":[4,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Ung exam","imp":"About sa kung panu ihandle. Ang store","top":"Wala. Po"},{"date":"2026-09-02","brand":"Figaro","store":"ASSUMPTION","pos":"Cashier","cat":"Store Visit","fac":["Alliana (Yana) Papa"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Putting dates and label","imp":"Adaptavility","top":"Barista"},{"date":"2026-09-02","brand":"Figaro","store":"ASSUMPTION","pos":"Cashier","cat":"Store Visit","fac":["Alliana (Yana) Papa"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"putting label/dates on the item","imp":"teamwork","top":"barista"},{"date":"2026-09-02","brand":"Figaro","store":"MMC","pos":"Bar/Cashier","cat":"Store Visit","fac":["Alliana (Yana) Papa"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Helping with orders","imp":"N/A","top":"N/A"},{"date":"2026-09-02","brand":"Figaro","store":"HIGHSTREET","pos":"Cashier","cat":"Store Visit","fac":["Alliana (Yana) Papa"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,4,5,4],"val":"Conducted calibration of espresso machine which help the operation to serve quality coffee","imp":"Hands on training for the staff and motivation them to cross-train other station","top":"Cross training for the staff."},{"date":"2026-09-03","brand":"Angel's Pizza","store":"PALIPARAN","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"N/a","imp":"N/a","top":"N/a"},{"date":"2026-09-03","brand":"Angel's Pizza","store":"FAIRVIEW","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"gtit","imp":"customer service","top":"role play"},{"date":"2026-09-03","brand":"Angel's Pizza","store":"DASMA","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Rider refreshment","imp":"Rider activities","top":"Rider refreshment"},{"date":"2026-09-03","brand":"Angel's Pizza","store":"AURORA","pos":"Dtl Rider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"GTIT","imp":"how to handle custumer","top":"nothing"},{"date":"2026-09-03","brand":"Angel's Pizza","store":"RETIRO","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"n/a","imp":"n/a","top":"n/a"},{"date":"2026-09-03","brand":"Angel's Pizza","store":"MONUMENTO","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Sa rider delivery po","imp":"Rider delivery","top":"Para mahasa pa po Ang kakayahan po namin"},{"date":"2026-09-03","brand":"Angel's Pizza","store":"DONA SOLEDAD","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"N/A","imp":"N/A","top":"N/A"},{"date":"2026-09-03","brand":"Angel's Pizza","store":"COGEO","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,4,5,4,5,5,5],"val":"sobrang malaking bagay po ang aking natutunan sa Descassion para mas lalo pa po lumawak ang aten isip","imp":"mas lalo pa po naten mapabuti ang aten trabaho at improved your self","top":"Mas lalo pang maiproprove ung sarili naten sa trabaho and sa customer"},{"date":"2026-09-03","brand":"Angel's Pizza","store":"SAN MATEO","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera"],"s":[5,5,5,5,5,5,4,4,4,4,4,4,4,4,4],"val":"Kung paano humandle ng costumer","imp":"Improve skills","top":"Kung paano mas mapabuti ang operasyon"},{"date":"2026-09-03","brand":"Angel's Pizza","store":"GENTRI","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Yung pag refresh sa mga standardize","imp":"Yung mga standard","top":"Yung sa gtit"},{"date":"2026-09-03","brand":"Angel's Pizza","store":"ALMANZA","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Exam part","imp":"Technology","top":"Goods and services"},{"date":"2026-09-03","brand":"Angel's Pizza","store":"UN AVE SHELL","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Lahat ng na discuss ay mahalaga at mapapakinabangan.","imp":".","top":"."},{"date":"2026-09-03","brand":"Angel's Pizza","store":"BACOOR","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Mas naintindihan mo yung work mo bilang isang rider","imp":"Mas pag iigihan pa ang trabaho bilang isang rider for angels pizza","top":"Maayos na pakikinig at programa"},{"date":"2026-09-03","brand":"Angel's Pizza","store":"ANTIPOLO","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Yes","imp":"Delivery aspect","top":"Motorcycle unit"},{"date":"2026-09-03","brand":"Angel's Pizza","store":"IMUS","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Balik tanaw","imp":"Gtit","top":"Maganda"},{"date":"2026-09-03","brand":"Angel's Pizza","store":"TAGAYTAY","pos":"Store Rider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"GTIT","imp":"Quality service and customer service","top":"Customer service"},{"date":"2026-09-03","brand":"Angel's Pizza","store":"CAINTA","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Lahat naman Ng natalakay sa rider refresher important biLang Isang rider","imp":"Lahat naman Ng talakay Ng maayos at maliwanag","top":"Napaka husay ni sir Alex mag refresh biLang Isang rider at kung paano magampanan Ng mabuti Ang rider at maiwasan Ang complain at paano mag win back Ang costumer, salamat ."},{"date":"2026-09-03","brand":"Angel's Pizza","store":"PETRON DASMA","pos":"Delivery Rider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Good costumer service","imp":"Good costumer service","top":"Good costumer service"},{"date":"2026-09-03","brand":"Angel's Pizza","store":"STA.ROSA","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Custumer service","imp":"Delivery specialist","top":"Casher refresher"},{"date":"2026-09-03","brand":"Angel's Pizza","store":"MEYCAUAYAN","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera","Josh Earnshaw"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Refresh","imp":"Refresh","top":"Refresh"},{"date":"2026-09-03","brand":"Angel's Pizza","store":"MAKATI","pos":"Raider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"N/a","imp":"N/a","top":"N/a"},{"date":"2026-09-03","brand":"Angel's Pizza","store":"MAKATI","pos":"Raider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Ok","imp":"Ok","top":"Ok"},{"date":"2026-09-03","brand":"Angel's Pizza","store":"NORTHRIDGE","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Good service try to win back the costumer","imp":"Good quality food deliver and greetings","top":"Deliver time service and follow up procedure"},{"date":"2026-09-03","brand":"Angel's Pizza","store":"WESTDRIVE","pos":"Rider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Good service and good delivery with appearance Delivery","imp":"GTIT","top":"bawat store one a month trainee delivery rider GTIT para malaman kung ginagawa talaga ng delivery rider yung tama Process ng delivrry para good image for costumer"},{"date":"2026-09-03","brand":"Angel's Pizza","store":"MARIKINA","pos":"Delivery Rider","cat":"Rider Refresher & Mobile App","fac":["Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Spell/gtit","imp":"Roll play","top":"Continues to refresher until we master Of value and delivery of product"},{"date":"2026-09-03","brand":"Figaro","store":"MONACO","pos":"Manager","cat":"Store Visit","fac":["Alliana (Yana) Papa"],"s":[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],"val":"since bago palang ako sa figaro company, kapag may concern or tanung po ako about sa store pwede po ako mag direct pm sya kanya. para ma guide na po ako.","imp":"sa ngayon okay naman","top":"sa ngayon yong nabanggit ni maam yana regarding sa cross training."},{"date":"2026-09-14","brand":"Figaro","store":"WM SUCAT","pos":"Barista","cat":"Barista & Coffee Bar Training","fac":["Ver Guerrero","Alliana (Yana) Papa","Josh Earnshaw"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"For how to use cavfiza or espresso cleaning product","imp":"For using the cleaning materials and equipment","top":"More latte art and barista knowledge"},{"date":"2026-09-14","brand":"Figaro","store":"UST","pos":"Cashier","cat":"Barista & Coffee Bar Training","fac":["James Nacionales","Ver Guerrero"],"s":[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],"val":"paano linisin ang machine ng maayos.","imp":"wala naman na .","top":"N/A"},{"date":"2026-09-14","brand":"Figaro","store":"WM NORTH EDSA","pos":"Barista","cat":"Barista & Coffee Bar Training","fac":["Ver Guerrero","Josh Earnshaw"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Maintaining the equipment to ensure the quality","imp":"N/A","top":"Equipment training"},{"date":"2026-09-14","brand":"Figaro","store":"DELOS SANTOS","pos":"Barista","cat":"Barista & Coffee Bar Training","fac":["Ver Guerrero","Josh Earnshaw"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Equipment cleaning and maintenance","imp":"N/a","top":"N/a"},{"date":"2026-09-14","brand":"Figaro","store":"F DASMA","pos":"Barista","cat":"Barista & Coffee Bar Training","fac":["Ver Guerrero"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Eapresso maintenance","imp":"Coffee standard","top":"Standardns"},{"date":"2026-09-14","brand":"Figaro","store":"BRICK ROAD","pos":"Teamleader","cat":"Barista & Coffee Bar Training","fac":["Ver Guerrero"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Backflashing","imp":"Closing procedure","top":"Bar"},{"date":"2026-09-14","brand":"Figaro","store":"THEATER ZONE","pos":"Barista","cat":"Barista & Coffee Bar Training","fac":["Ver Guerrero","Alliana (Yana) Papa","Josh Earnshaw"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"paglinis ng espresso machine","imp":"ang pag latte art","top":"master class"},{"date":"2026-09-14","brand":"Figaro","store":"MONACO","pos":"Cashier","cat":"Barista & Coffee Bar Training","fac":["Ver Guerrero","Alliana (Yana) Papa","Josh Earnshaw"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"All","imp":"Na","top":"Na"},{"date":"2026-09-14","brand":"Figaro","store":"PGH","pos":"Barista","cat":"Barista & Coffee Bar Training","fac":["Josh Earnshaw"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"lahat ng mga tinuro ni training department","imp":"kaalaman upang maalagaan ang kagamitan sa store","top":"n/a"},{"date":"2026-09-17","brand":"Angel's Pizza Express","store":"PORTA VAGA BAGUIO","pos":"Food Prep","cat":"Store Visit","fac":["Ann Barredo"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Shelflife knowledge","imp":"Legendary shelflife","top":"More knowledge"},{"date":"2026-09-18","brand":"Angel's Pizza","store":"BAGUIO","pos":"Shift Manager","cat":"Technical Validation & Evaluation","fac":["Ann Barredo","Alliana (Yana) Papa"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"SOP refresher","imp":"None","top":"None"},{"date":"2026-09-24","brand":"Angel's Pizza","store":"LUCAO","pos":"Kicthen Staff","cat":"Customer Service Refresher","fac":["Alex Rivera"],"s":[5,5,5,4,4,4,5,5,5,5,5,5,5,5,5],"val":"about sa mga standard nang store","imp":"isasaulo at mas lalo, mung pag bubutihin nang yong trabaho","top":"nothing"},{"date":"2026-09-24","brand":"Angel's Pizza","store":"LUCAO","pos":"Service","cat":"Customer Service Refresher","fac":["Leo Fernandez","Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Lahat po ng sinabi nila","imp":"Gawin lahat ng natutunan upang mapabuti at mapabilis ang trabaho","top":"Ang aking mga natutunan sa aming ginawa"},{"date":"2026-09-24","brand":"Angel's Pizza","store":"LUCAO","pos":"Cashier","cat":"Customer Service Refresher","fac":["Leo Fernandez","Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Ang pagiging Isang customer service dahil dito makikita ng customers kung gaano sila kahalaga sa store","imp":"Maging mabuti at maayos ang pakikisama sa mga customers upang silay ganahan at bumalik sa store","top":"Maging aral lahat sa akin ang mga naituro sa amin at ito din ang magiging way upang tumaas ang benta"},{"date":"2026-09-24","brand":"Angel's Pizza","store":"LUCAO","pos":"Makeline","cat":"Customer Service Refresher","fac":["Alex Rivera"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Maslalong malawak ang natutunan ko","imp":"Mas ma iimprove ko ang sarili ko dahil sa pag punta ng training dep","top":"Makita nila na lahat ng tinuro saakin ayy nagawa ko na ng maayos"},{"date":"2026-09-28","brand":"Figaro","store":"TRINOMA","pos":"Management Trainee","cat":"Store Visit","fac":["Ver Guerrero"],"s":[5,5,4,4,5,5,5,5,5,5,5,5,5,5,5],"val":"Giving insights in all aspects of the operation","imp":"I like having seminars and trainings it can help a lot in improving the skills and knowledge of the individuals","top":"More on technical skills. So far the training department has a lot of activities that can really help the store improving their performance."},{"date":"2026-09-28","brand":"Figaro","store":"TRINOMA","pos":"Cashier","cat":"Store Visit","fac":["Ver Guerrero"],"s":[5,5,5,5,5,5,5,5,5,5,5,5,5,5,5],"val":"Panatilihin tandaan at sundin ang standard procedure sa trabaho.","imp":"handouts o presentation materials?","top":"Bar"}]};
+const ITEMS = DATA.items;
+const GROUPS = {Delivery:[0,2,3,5,8], Content:[1,4,6,7], Impact:[9,10,11,12,13,14]};
+const TEAM = "Team Effort";
+const MONTHS = {"07":"Jul","08":"Aug","09":"Sep"};
+const FULL = new Set(["Alex Rivera","James Nacionales","Josh Earnshaw","Nica Tardio","Ricelle (Rice) Lim","Leo Fernandez","Ann Barredo","Alliana (Yana) Papa","Ver Guerrero","Daniel De Leon"]);
+const recs = DATA.recs.map(r=>({...r, mean:r.s.reduce((a,b)=>a+b,0)/15, month:r.date.slice(5,7), rev:r.s.every(v=>v===1)}));
+const state = {month:"all", brand:"all", excl:false, sort:{key:"n",dir:-1}, sel:null};
+
+const $ = id=>document.getElementById(id);
+const esc = s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt2 = v=>v==null||isNaN(v)?"–":v.toFixed(2);
+const pct = v=>v==null||isNaN(v)?"–":Math.round(v*100)+"%";
+const band = v=>v>=4.5?["Excellent","b-ex"]:v>=4?["Very Good","b-vg"]:v>=3?["Good","b-gd"]:["Fair / Poor","b-lo"];
+const fdate = d=>{const [y,m,dd]=d.split("-");return `${+dd} ${MONTHS[m]||m}`};
+const mean = a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:NaN;
+const junk = s=>!s||/^(none|n\/?a|nothing|wala.*|\?|ok(ay)?|good|no|na|none so far)\.?$/i.test(s.trim())||s.trim().length<3;
+
+function filtered(){
+  return recs.filter(r=>(state.month==="all"||r.month===state.month)&&(state.brand==="all"||r.brand===state.brand)&&!(state.excl&&r.rev));
+}
+function groups(rs){
+  const g = new Map();
+  for(const r of rs){
+    const ks = r.fac.length? r.fac : [TEAM];
+    for(const k of ks){ if(!g.has(k)) g.set(k,[]); g.get(k).push(r); }
+  }
+  return g;
+}
+function metrics(name, rs){
+  const sec = k=>mean(rs.map(r=>mean(GROUPS[k].map(i=>r.s[i]))));
+  const co = rs.filter(r=>r.fac.length>1).length;
+  return {name, team:name===TEAM, rs, n:rs.length, solo:rs.length-co, co,
+    stores:new Set(rs.map(r=>r.store).filter(Boolean)).size,
+    days:new Set(rs.map(r=>r.date)).size,
+    brands:[...new Set(rs.map(r=>r.brand))],
+    avg:mean(rs.map(r=>r.mean)), del:sec("Delivery"), con:sec("Content"), imp:sec("Impact"),
+    sat:rs.filter(r=>r.s[9]>=4).length/rs.length, low:rs.filter(r=>r.mean<3).length};
+}
+
+const COLS = [
+  {k:"rank",l:"#",nos:true},
+  {k:"name",l:"Facilitator"},
+  {k:"n",l:"Evals"},
+  {k:"solo",l:"Solo / Co"},
+  {k:"stores",l:"Stores"},
+  {k:"days",l:"Activity days"},
+  {k:"avg",l:"Avg rating"},
+  {k:"del",l:"Delivery"},
+  {k:"con",l:"Content"},
+  {k:"imp",l:"Impact"},
+  {k:"sat",l:"Satisfied"},
+  {k:"low",l:"Low (<3)"},
+  {k:"band",l:"Rating",nos:true},
+];
+
+function render(){
+  const rs = filtered();
+  const g = groups(rs);
+  const all = [...g.entries()].map(([k,v])=>metrics(k,v));
+  const named = all.filter(m=>!m.team);
+  const team = all.find(m=>m.team);
+  const {key,dir} = state.sort;
+  named.sort((a,b)=>{const x=a[key],y=b[key]; if(typeof x==="string") return dir*x.localeCompare(y); return dir*((x-y)||(b.n-a.n)||(b.avg-a.avg));});
+  if(key==="n"||key==="avg"){} // ranks follow the current sort
+  const deptAvg = mean(rs.map(r=>r.mean));
+
+  // KPIs
+  const teamShare = rs.length? rs.filter(r=>!r.fac.length).length/rs.length : NaN;
+  const [bl] = band(deptAvg||0);
+  $("kpis").innerHTML = [
+    ["Evaluations received", rs.length, `${new Set(rs.map(r=>r.date)).size} activity days · ${new Set(rs.map(r=>r.store)).size} stores`],
+    ["Department avg rating", `${fmt2(deptAvg)}<small> / 5</small>`, rs.length? `${bl} band` : "No responses"],
+    ["Satisfaction rate", pct(rs.filter(r=>r.s[9]>=4).length/rs.length), "Rated 4–5 on overall satisfaction"],
+    ["Named facilitators", named.length, named.length? `Most evaluated: ${named.slice().sort((a,b)=>b.n-a.n)[0].name}` : "–"],
+    ["Team Effort share", pct(teamShare), `${team?team.n:0} responses with no named facilitator`],
+  ].map(([l,v,h])=>`<div class="kpi"><div class="lbl">${l}</div><div class="val">${v}</div><div class="hint">${esc(h)}</div></div>`).join("");
+
+  // table
+  $("score").tHead.innerHTML = "<tr>"+COLS.map(c=>c.nos?`<th>${c.l}</th>`:`<th><button type="button" data-k="${c.k}" ${key===c.k?`data-dir="${dir<0?"↓":"↑"}"`:""}>${c.l}</button></th>`).join("")+"</tr>";
+  const row = (m,i)=>{
+    const [bt,bc]=band(m.avg);
+    const role = m.team? "No individual named" : (FULL.has(m.name)?"":"Not on TDD roster list");
+    return `<tr tabindex="0" data-name="${esc(m.name)}" class="${m.team?"team":""}" aria-selected="${state.sel===m.name}">
+      <td class="rank">${m.team?"—":i+1}</td>
+      <td class="name"><span class="sw" style="background:var(${m.team?"--team":"--series"})"></span>${esc(m.name)}${m.n<5?'<span class="lowsample">LOW n</span>':""}${role?`<small>${esc(role)}</small>`:""}</td>
+      <td><b>${m.n}</b></td><td class="dim">${m.solo} / ${m.co}</td><td>${m.stores}</td><td>${m.days}</td>
+      <td><b>${fmt2(m.avg)}</b></td><td>${fmt2(m.del)}</td><td>${fmt2(m.con)}</td><td>${fmt2(m.imp)}</td>
+      <td>${pct(m.sat)}</td><td class="${m.low?"flag":"dim"}">${m.low}</td>
+      <td><span class="pill ${bc}">${bt}</span></td></tr>`;
+  };
+  $("score").tBodies[0].innerHTML = named.map(row).join("") + (team?row(team):"") ||
+    `<tr><td colspan="13" class="empty">No responses match these filters.</td></tr>`;
+
+  const ordered = named.slice().sort((a,b)=>b.n-a.n||b.avg-a.avg).concat(team?[team]:[]);
+  drawCount(ordered); drawAvg(ordered, deptAvg); drawHeat(g);
+  // profile
+  const names = ordered.map(m=>m.name);
+  if(!names.includes(state.sel)) state.sel = names[0]||null;
+  $("facSel").innerHTML = names.map(n=>`<option ${n===state.sel?"selected":""}>${esc(n)}</option>`).join("");
+  document.querySelectorAll("#score tbody tr").forEach(tr=>tr.setAttribute("aria-selected", tr.dataset.name===state.sel));
+  drawProfile(all.find(m=>m.name===state.sel), rs);
+  drawLow(rs);
+  // notes
+  const months = [...new Set(rs.map(r=>r.month))].sort().map(m=>MONTHS[m]);
+  $("filterNote").textContent = `${rs.length} of ${recs.length} responses shown`;
+}
+
+const tip = $("tip");
+function showTip(e,html){tip.innerHTML=html;tip.hidden=false;const x=Math.min(e.clientX+14, innerWidth-tip.offsetWidth-8);const y=Math.min(e.clientY+14, innerHeight-tip.offsetHeight-8);tip.style.left=x+"px";tip.style.top=y+"px";}
+function hideTip(){tip.hidden=true}
+function bindTips(svg){
+  svg.querySelectorAll("[data-tip]").forEach(el=>{
+    el.addEventListener("pointermove",e=>showTip(e,el.dataset.tip));
+    el.addEventListener("pointerleave",hideTip);
+  });
+}
+function svgW(svg){return Math.max(300, svg.clientWidth||svg.parentNode.clientWidth-36)}
+
+function drawCount(list){
+  const svg=$("cCount"), W=svgW(svg), L=Math.min(150,W*.36), R=36, rowH=26, top=6, H=top+list.length*rowH+24;
+  const max=Math.max(1,...list.map(m=>m.n)); const nice=Math.ceil(max/10)*10;
+  const x=v=>L+(W-L-R)*v/nice;
+  let s="";
+  for(let t=0;t<=nice;t+=nice/5){s+=`<line x1="${x(t)}" x2="${x(t)}" y1="${top}" y2="${H-22}" stroke="var(--grid)"/><text x="${x(t)}" y="${H-6}" text-anchor="middle" font-size="11" fill="var(--muted)">${t}</text>`;}
+  list.forEach((m,i)=>{
+    const y=top+i*rowH, bw=Math.max(2,x(m.n)-L);
+    s+=`<g data-tip="<b>${esc(m.name)}</b><br>${m.n} evaluations · ${m.solo} solo, ${m.co} co-facilitated<br>${m.stores} stores · ${m.days} activity days">
+      <rect x="0" y="${y}" width="${W}" height="${rowH}" fill="transparent"/>
+      <text x="${L-8}" y="${y+rowH/2+4}" text-anchor="end" font-size="12" fill="var(--ink-2)">${esc(short(m.name))}</text>
+      <rect x="${L}" y="${y+6}" width="${bw}" height="${rowH-12}" rx="3" fill="var(${m.team?"--team":"--series"})"/>
+      <text x="${L+bw+6}" y="${y+rowH/2+4}" font-size="12" font-weight="600" fill="var(--ink)">${m.n}</text></g>`;
+  });
+  s+=`<line x1="${L}" x2="${L}" y1="${top}" y2="${H-22}" stroke="var(--line-2)"/>`;
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`); svg.setAttribute("height",H); svg.innerHTML=s; bindTips(svg);
+}
+function short(n){return n.replace(" (Yana)","").replace(" (Rice)","")}
+function drawAvg(list, dept){
+  const svg=$("cAvg"), W=svgW(svg), L=Math.min(150,W*.36), R=40, rowH=26, top=6, H=top+list.length*rowH+24;
+  const minV=Math.min(3,...list.map(m=>m.avg)); const lo=Math.floor(minV*2)/2;
+  const x=v=>L+(W-L-R)*(v-lo)/(5-lo);
+  let s="";
+  for(let t=lo;t<=5.0001;t+=0.5){s+=`<line x1="${x(t)}" x2="${x(t)}" y1="${top}" y2="${H-22}" stroke="var(--grid)"/><text x="${x(t)}" y="${H-6}" text-anchor="middle" font-size="11" fill="var(--muted)">${t.toFixed(1)}</text>`;}
+  if(!isNaN(dept)) s+=`<line x1="${x(dept)}" x2="${x(dept)}" y1="${top}" y2="${H-22}" stroke="var(--ink-2)" stroke-dasharray="4 3"/>`;
+  list.forEach((m,i)=>{
+    const y=top+i*rowH+rowH/2;
+    s+=`<g data-tip="<b>${esc(m.name)}</b><br>Average ${fmt2(m.avg)} · ${band(m.avg)[0]}<br>Delivery ${fmt2(m.del)} · Content ${fmt2(m.con)} · Impact ${fmt2(m.imp)}<br>${m.n} evaluations">
+      <rect x="0" y="${y-rowH/2}" width="${W}" height="${rowH}" fill="transparent"/>
+      <text x="${L-8}" y="${y+4}" text-anchor="end" font-size="12" fill="var(--ink-2)">${esc(short(m.name))}</text>
+      <line x1="${L}" x2="${x(m.avg)}" y1="${y}" y2="${y}" stroke="var(--line-2)" stroke-width="2"/>
+      <circle cx="${x(m.avg)}" cy="${y}" r="5.5" fill="var(${m.team?"--team":"--series"})" stroke="var(--surface)" stroke-width="2"/>
+      <text x="${x(m.avg)+10}" y="${y+4}" font-size="12" font-weight="600" fill="var(--ink)">${fmt2(m.avg)}</text></g>`;
+  });
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`); svg.setAttribute("height",H); svg.innerHTML=s; bindTips(svg);
+}
+function drawHeat(g){
+  const months = ["07","08","09"].filter(m=>state.month==="all"||m===state.month);
+  const list=[...g.entries()].map(([k,v])=>({k,v})).sort((a,b)=>(a.k===TEAM)-(b.k===TEAM)||b.v.length-a.v.length);
+  const max=Math.max(1,...list.flatMap(o=>months.map(m=>o.v.filter(r=>r.month===m).length)));
+  let h=`<thead><tr><th>Facilitator</th>${months.map(m=>`<th style="text-align:center">${MONTHS[m]} 2026</th>`).join("")}<th style="text-align:center">Total</th></tr></thead><tbody>`;
+  for(const o of list){
+    h+=`<tr style="cursor:default"><td>${esc(o.k)}</td>`;
+    for(const m of months){const c=o.v.filter(r=>r.month===m).length;const p=c?Math.round(12+78*c/max):0;
+      const bg=c?`color-mix(in srgb, var(${o.k===TEAM?"--team":"--series"}) ${p}%, var(--surface))`:"transparent";
+      h+=`<td style="background:${bg};color:${p>52?"#fff":c?"var(--ink)":"var(--muted)"}">${c||"·"}</td>`;}
+    h+=`<td><b>${o.v.length}</b></td></tr>`;
+  }
+  $("heat").innerHTML=h+"</tbody>";
+}
+function drawProfile(m, rs){
+  if(!m){$("pTitle").textContent="Facilitator profile";$("pStats").innerHTML='<span class="empty">No responses match these filters.</span>';["pActs","pCo","pStores","pVal","pImp"].forEach(i=>$(i).innerHTML="");$("cCrit").innerHTML="";return;}
+  $("pTitle").textContent = m.name;
+  $("pLeg").textContent = short(m.name);
+  const [bt,bc]=band(m.avg);
+  $("pStats").innerHTML = [[m.n,"evaluations"],[fmt2(m.avg),"avg rating"],[pct(m.sat),"satisfied"],[m.stores,"stores"],[m.days,"activity days"],[m.brands.length,"brand"+(m.brands.length>1?"s":"")]]
+    .map(([a,b])=>`<span class="stat"><b>${a}</b>${b}</span>`).join("")+` <span class="pill ${bc}" style="align-self:center">${bt}</span>`;
+  // criteria
+  const svg=$("cCrit"), W=svgW(svg), narrow=W<560, R=40, top=4;
+  const L=narrow?8:Math.min(300,W*.58), rowH=narrow?40:24, H=top+ITEMS.length*rowH+24;
+  const maxCh=narrow?Math.floor((W-12)/6.3):Math.floor((L-16)/6.3);
+  const fv=ITEMS.map((_,i)=>mean(m.rs.map(r=>r.s[i]))), dv=ITEMS.map((_,i)=>mean(rs.map(r=>r.s[i])));
+  const lo=Math.floor(Math.min(3,...fv,...dv)*2)/2, x=v=>L+(W-L-R)*(v-lo)/(5-lo);
+  let s="";
+  for(let t=lo;t<=5.0001;t+=0.5){s+=`<line x1="${x(t)}" x2="${x(t)}" y1="${top}" y2="${H-22}" stroke="var(--grid)"/><text x="${x(t)}" y="${H-6}" text-anchor="middle" font-size="11" fill="var(--muted)">${t.toFixed(1)}</text>`;}
+  ITEMS.forEach((it,i)=>{const y0=top+i*rowH, y=narrow?y0+28:y0+rowH/2; const lbl=it.length>maxCh?it.slice(0,maxCh-1)+"…":it;
+    const sep = (i===9)?`<line x1="0" x2="${W}" y1="${y0}" y2="${y0}" stroke="var(--line-2)" stroke-dasharray="2 3"/>`:"";
+    const lab = narrow?`<text x="${L}" y="${y0+13}" font-size="11.5" fill="var(--ink-2)">${esc(lbl)}</text>`:`<text x="${L-10}" y="${y+4}" text-anchor="end" font-size="11.5" fill="var(--ink-2)">${esc(lbl)}</text>`;
+    s+=`${sep}<g data-tip="<b>${esc(it)}</b><br>${esc(m.name)}: ${fmt2(fv[i])}<br>Department: ${fmt2(dv[i])}">
+    <rect x="0" y="${y0}" width="${W}" height="${rowH}" fill="transparent"/>${lab}
+    <line x1="${x(Math.min(fv[i],dv[i]))}" x2="${x(Math.max(fv[i],dv[i]))}" y1="${y}" y2="${y}" stroke="var(--line-2)" stroke-width="2"/>
+    <circle cx="${x(dv[i])}" cy="${y}" r="4.5" fill="var(--surface)" stroke="var(--muted)" stroke-width="2"/>
+    <circle cx="${x(fv[i])}" cy="${y}" r="5" fill="var(${m.team?"--team":"--series"})" stroke="var(--surface)" stroke-width="1.5"/>
+    <text x="${W-2}" y="${y+4}" text-anchor="end" font-size="11.5" font-weight="600" fill="var(--ink)">${fmt2(fv[i])}</text></g>`;});
+  svg.setAttribute("viewBox",`0 0 ${W} ${H}`); svg.setAttribute("height",H); svg.innerHTML=s; bindTips(svg);
+  // activities
+  const ac={}; m.rs.forEach(r=>ac[r.cat]=(ac[r.cat]||0)+1);
+  $("pActs").innerHTML=Object.entries(ac).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<li><span>${esc(k)}</span><span>${v}</span></li>`).join("");
+  const co={}; m.rs.forEach(r=>r.fac.forEach(f=>{if(f!==m.name) co[f]=(co[f]||0)+1}));
+  $("pCo").innerHTML=Object.keys(co).length?Object.entries(co).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<span class="chip">${esc(short(k))} · ${v}</span>`).join(""):'<span class="empty">Solo sessions only</span>';
+  const st={}; m.rs.forEach(r=>{if(r.store) st[r.store]=(st[r.store]||0)+1});
+  $("pStores").innerHTML=Object.entries(st).sort((a,b)=>b[1]-a[1]||a[0].localeCompare(b[0])).map(([k,v])=>`<span class="chip">${esc(k)}${v>1?" · "+v:""}</span>`).join("");
+  const q=(arr)=>arr.length?arr.map(o=>`<div class="q">${esc(o.t)}<small>${esc(o.m)}</small></div>`).join(""):'<span class="empty">No written comments.</span>';
+  const meta=r=>`${r.pos||"Staff"} · ${r.store||r.brand} · ${fdate(r.date)}`;
+  $("pVal").innerHTML=q(m.rs.filter(r=>!junk(r.val)).map(r=>({t:r.val,m:meta(r)})));
+  $("pImp").innerHTML=q(m.rs.flatMap(r=>[!junk(r.imp)&&{t:"Improve: "+r.imp,m:meta(r)},!junk(r.top)&&{t:"Topic: "+r.top,m:meta(r)}].filter(Boolean)));
+}
+function drawLow(rs){
+  const low=rs.filter(r=>r.mean<3).sort((a,b)=>a.date.localeCompare(b.date));
+  $("lowT").innerHTML = low.length? `<thead><tr><th>Date</th><th>Store</th><th>Activity</th><th>Credited to</th><th>Avg</th><th style="text-align:left">Participant comment</th></tr></thead><tbody>`+
+    low.map(r=>`<tr style="cursor:default"><td style="text-align:left">${fdate(r.date)}</td><td style="text-align:left">${esc(r.store)}</td><td style="text-align:left">${esc(r.cat)}</td><td style="text-align:left">${esc(r.fac.length?r.fac.map(short).join(", "):TEAM)}</td><td class="flag">${fmt2(r.mean)}</td><td style="text-align:left;white-space:normal;min-width:240px">${esc(r.val||"–")}${r.rev?' <span class="pill b-gd">likely misread</span>':""}</td></tr>`).join("")+"</tbody>"
+    : '<tbody><tr><td class="empty" style="text-align:left">No responses below 3.00 for these filters.</td></tr></tbody>';
+}
+
+// init
+const dates=recs.map(r=>r.date).sort();
+$("periodLbl").textContent=`${fdate(dates[0])} – ${fdate(dates.at(-1))} 2026`;
+$("nAll").textContent=recs.length;
+const nrev=recs.filter(r=>r.rev).length;
+$("revCount").textContent=`(${nrev})`;
+$("revNote").textContent=`${nrev} responses rated every item 1 (Poor) while writing positive comments such as "all they've said is helpful". These look like respondents reading 1 as the best score. They are kept by default so the report matches the raw survey; tick "Exclude likely scale misreads" to see ratings without them.`;
+[...new Set(recs.map(r=>r.brand))].sort().forEach(b=>$("brandSel").insertAdjacentHTML("beforeend",`<option value="${esc(b)}">${esc(b)}</option>`));
+$("monthSeg").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;state.month=b.dataset.m;$("monthSeg").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));render();});
+$("brandSel").addEventListener("change",e=>{state.brand=e.target.value;render();});
+$("exclRev").addEventListener("change",e=>{state.excl=e.target.checked;render();});
+$("facSel").addEventListener("change",e=>{state.sel=e.target.value;render();});
+$("score").addEventListener("click",e=>{
+  const b=e.target.closest("th button"); if(b){const k=b.dataset.k; state.sort = state.sort.key===k?{key:k,dir:-state.sort.dir}:{key:k,dir:k==="name"?1:-1}; render(); return;}
+  const tr=e.target.closest("tbody tr[data-name]"); if(tr){state.sel=tr.dataset.name; render(); $("profile").scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});}
+});
+$("score").addEventListener("keydown",e=>{if(e.key==="Enter"){const tr=e.target.closest("tbody tr[data-name]");if(tr){state.sel=tr.dataset.name;render();}}});
+let rt; addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(render,120)});
+render();
+</script>
+
+</body></html>
