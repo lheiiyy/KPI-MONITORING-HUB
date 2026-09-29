@@ -79,6 +79,13 @@ trusted (private distribution of the link only).
 No build step — every page is a self-contained static HTML file, so
 Netlify can serve this repo's root directly with no build command.
 
+- **`pages/activity.html`** — Activity Monitoring: an interactive Kanban (drag & drop, add/edit,
+  filters, search, live summary) backed by a real `ACTIVITY` table in the *Training Program & Delivery
+  Monitoring 2026* workbook via an Apps Script API (`backend/apps-script/`). Unlike the static pages above it
+  reads and writes live data and needs a per-user token. Docs: `docs/ACTIVITY_SCHEMA.md`,
+  `docs/ACTIVITY_API.md`, `docs/ACTIVITY_SETUP.md`. Until `apiUrl` is set in `js/activity-config.js` the page
+  shows a "not configured" message.
+
 ## Google Drive
 
 All five KRAs' underlying logs live in the "KPI Data sheet (Pilot)"
