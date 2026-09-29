@@ -39,6 +39,19 @@ a.card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .card p{margin:0;color:var(--ink-2);font-size:13px}
 .card .formula{font:500 11px var(--mono);color:var(--muted)}
 .card .go{margin-top:4px;font:600 12.5px var(--body);color:var(--accent)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:grid;gap:12px}
+.panel h2{font:700 18px/1.25 var(--display);margin:0}
+.panel p.desc{margin:0;color:var(--ink-2);font-size:13px;max-width:80ch}
+.tscroll{overflow-x:auto;margin-inline:-4px}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th,td{padding:8px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--line)}
+th{font:500 10.5px/1.2 var(--mono);letter-spacing:.03em;text-transform:uppercase;color:var(--muted);vertical-align:bottom}
+th:first-child,td:first-child{text-align:left}
+td:first-child{font-weight:600}
+td.pending{color:var(--muted)}
+td.total{font-weight:700;color:var(--ink)}
+tr.notroster td:first-child small{display:block;font-weight:400;color:var(--muted);font-size:10.5px}
+.fnote{font-size:12px;color:var(--muted);margin:0}
 footer{color:var(--muted);font-size:12px;border-top:1px solid var(--line);padding-top:14px}
 </style>
 </head><body>
@@ -90,6 +103,44 @@ footer{color:var(--muted);font-size:12px;border-top:1px solid var(--line);paddin
       <div class="formula">Average Survey Score / Maximum Possible Score &times; 100%</div>
       <div class="go">Open facilitator scorecard &rarr;</div>
     </a>
+  </section>
+
+  <section class="panel" aria-label="Facilitator roster across all KRAs">
+    <h2>Facilitator roster &mdash; across all 5 KRAs</h2>
+    <p class="desc">The same 12-member Training Department roster (from the Coaching &amp; Feedback scorecard, the
+      Training Program &amp; Delivery Monitoring 2026 facilitator list, and the TDD Team Attendance Monitoring 2026
+      team-member list) ties every module together. Only Coaching &amp; Feedback has real logged data so far
+      (Jul&ndash;Sep 2026); the other four modules' sheets are live but not yet filled in, so their columns read
+      &ldquo;pending&rdquo; per person until real entries land there &mdash; this table will fill in on its own as
+      that happens, with no restructuring needed.</p>
+    <div class="tscroll">
+      <table>
+        <thead><tr>
+          <th>Facilitator</th><th>Attendance<br>10%</th><th>Store Visit<br>Compliance 25%</th>
+          <th>Staff Proficiency<br>25%</th><th>Training Program<br>Delivery 20%</th>
+          <th>Coaching &amp; Feedback<br>20%</th><th>Partial total</th>
+        </tr></thead>
+        <tbody>
+          <tr><td>Alex Rivera</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td>19.76</td><td class="total">19.76 / 100</td></tr>
+          <tr><td>Alliana (Yana) Papa</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td>16.76</td><td class="total">16.76 / 100</td></tr>
+          <tr><td>Ann Barredo</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td>18.64</td><td class="total">18.64 / 100</td></tr>
+          <tr><td>Charlie Moises</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">no evals this period</td><td class="total">&mdash;</td></tr>
+          <tr><td>Daniel De Leon</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td>19.84</td><td class="total">19.84 / 100</td></tr>
+          <tr><td>Geoffrey Carranceja</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">no evals this period</td><td class="total">&mdash;</td></tr>
+          <tr><td>James Nacionales</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td>17.24</td><td class="total">17.24 / 100</td></tr>
+          <tr><td>Josh Earnshaw</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td>20.00</td><td class="total">20.00 / 100</td></tr>
+          <tr><td>Leo Fernandez</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td>19.68</td><td class="total">19.68 / 100</td></tr>
+          <tr><td>Nica Tardio</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td>18.20</td><td class="total">18.20 / 100</td></tr>
+          <tr><td>Ricelle (Rice) Lim</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td>19.72</td><td class="total">19.72 / 100</td></tr>
+          <tr><td>Ver Guerrero</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td>18.84</td><td class="total">18.84 / 100</td></tr>
+          <tr class="notroster"><td>Team Effort<br><small>shared-credit entries, not an individual roster member</small></td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td class="pending">pending</td><td>18.84</td><td class="total">18.84 / 100</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="fnote">Coaching &amp; Feedback column = (facilitator's Jul&ndash;Sep 2026 average rating &divide; 5) &times; 20% weight, from
+      pages/coaching-feedback.html. Sky, Dennis and Jov Palattao also appear in Coaching &amp; Feedback evaluations but
+      aren't on the official TDD roster in the other four sheets, so they're left off this cross-KRA table &mdash;
+      see the facilitator scorecard for their individual numbers.</p>
   </section>
 
   <footer>Source data: Store Visit Evaluation Survey, [sys] STORE VISIT 2026, Training Program &amp; Delivery Monitoring 2026,

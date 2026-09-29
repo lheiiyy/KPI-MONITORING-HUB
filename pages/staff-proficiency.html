@@ -37,6 +37,9 @@ dl{margin:0;display:grid;grid-template-columns:max-content 1fr;gap:6px 16px;font
 dt{color:var(--muted);font:500 11px var(--mono);letter-spacing:.04em;text-transform:uppercase;align-self:start;padding-top:2px}
 dd{margin:0}
 .notes{font-size:13px;color:var(--ink-2)}
+.notes a{color:var(--accent)}
+.roster{display:flex;flex-wrap:wrap;gap:8px}
+.roster span{border:1px solid var(--line-2);border-radius:999px;padding:4px 10px;font-size:12.5px;color:var(--muted)}
 </style>
 </head><body>
 <div class="wrap">
@@ -70,6 +73,19 @@ dd{margin:0}
       records.</p>
     <p>At 25.00% against a target of 3/week, this is currently the KRA furthest from target &mdash; worth flagging in
       coaching conversations alongside the Coaching &amp; Feedback numbers.</p>
+  </section>
+
+  <section class="panel notes">
+    <h2>Facilitator roster</h2>
+    <p>The same 12-member Training Department roster used on every KRA page (see the
+      <a href="../index.html">landing page's cross-KRA table</a>). Per-person certification counts aren't broken out
+      here by design &mdash; that breakdown lives in SVMI_Project's own reporting layer against
+      [sys] STORE VISIT 2026, not duplicated in this static page.</p>
+    <div class="roster">
+      <span>Alex Rivera</span><span>Alliana (Yana) Papa</span><span>Ann Barredo</span><span>Charlie Moises</span>
+      <span>Daniel De Leon</span><span>Geoffrey Carranceja</span><span>James Nacionales</span><span>Josh Earnshaw</span>
+      <span>Leo Fernandez</span><span>Nica Tardio</span><span>Ricelle (Rice) Lim</span><span>Ver Guerrero</span>
+    </div>
   </section>
 </div>
 </body></html>
