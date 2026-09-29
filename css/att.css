@@ -84,3 +84,19 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .toast.err{background:var(--bad);color:#fff}
 @media (max-width:700px){.grid2{grid-template-columns:1fr}.board{grid-template-columns:repeat(4,minmax(78vw,1fr))}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* --- Training delivery additions --- */
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 12px;display:grid;gap:2px}
+.stat .k{font:500 10.5px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.stat .v{font:700 20px var(--display)}
+.stat[data-stat=overdue] .v{color:var(--bad)}
+.emptyboard{grid-column:1/-1;background:var(--surface);border:1px dashed var(--line-2);border-radius:12px;padding:16px;color:var(--ink-2)}
+.board{position:relative}
+.card .row select{min-height:32px}
+@media (max-width:700px){
+  .board{scroll-snap-type:x mandatory}.col{scroll-snap-align:start}
+  .card .row select,.card .row button{min-height:44px;font-size:14px}
+  .bar select,.bar input,.bar button{min-height:44px}
+  input,select,textarea{font-size:16px}
+}

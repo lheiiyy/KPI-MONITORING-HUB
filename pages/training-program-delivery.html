@@ -53,6 +53,11 @@ dd{margin:0}
   <div id="kraMount"></div>
 
   <section class="panel">
+    <h2>Live delivery report</h2>
+    <div id="deliveryReport">Loading…</div>
+  </section>
+
+  <section class="panel">
     <h2>How this KRA is scored</h2>
     <dl>
       <dt>Formula</dt><dd>Programs Delivered / Programs Required &times; 100%</dd>
@@ -71,6 +76,14 @@ dd{margin:0}
   </section>
 
 </div>
+<script src="../js/att/errors.js"></script>
+<script src="../js/att/domain.js"></script>
+<script src="../js/att/service.js"></script>
+<script src="../js/att/adapters/memory.js"></script>
+<script src="../js/att/adapters/sheets.js"></script>
+<script src="../js/att/config.js"></script>
+<script src="../js/att/boot.js"></script>
+<script src="../js/att/delivery-report.js"></script>
 <script src="../js/kpi.js"></script>
 <script>KPI.mountKra(document.getElementById("kraMount"),"training_delivery");</script>
 </body></html>

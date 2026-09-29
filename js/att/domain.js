@@ -125,11 +125,107 @@
     return { workingDays: wd, daysPresent: present, lates: lates, absences: absences, leaveDays: leave, ratingPct: pct };
   }
 
+  // ---- Training delivery reporting ----------------------------------------------------------
+  // Everything here is derived from session records; nothing is stored or hard-coded.
+  // The hub's Training Program Delivery page states: "Programs Delivered / Programs Required x 100%"
+  // with target "at least 2 programs per month". That target is the only number below, and it is
+  // a parameter (defaults pending HRAD confirmation, like the attendance flags).
+  var TARGET_PROGRAMS_PER_MONTH = 2;
+
+  function todayISO(d) { d = d || new Date(); function p(n) { return (n < 10 ? '0' : '') + n; } return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()); }
+  function isNum(v) { return typeof v === 'number' && isFinite(v); }
+  function round2(n) { return Math.round(n * 100) / 100; }
+
+  // Years present in the data plus the current year: never a constant, so 2027+ needs no code change.
+  function sessionYears(sessions, today) {
+    var seen = {}; seen[(today || todayISO()).slice(0, 4)] = true;
+    (sessions || []).forEach(function (s) { if (s.date) seen[s.date.slice(0, 4)] = true; });
+    return Object.keys(seen).sort().reverse();
+  }
+
+  // Months of the period that count towards "programs required" (0 => no requirement yet).
+  function monthsInPeriod(year, month, today) {
+    if (!year) return null;
+    if (month) return 1;
+    var cy = +today.slice(0, 4), cm = +today.slice(5, 7);
+    if (+year < cy) return 12; if (+year === cy) return cm; return 0;
+  }
+
+  // opts: { year:'2026'|'', month:'01'..'12'|'', today:'yyyy-mm-dd', roster:[names], targetPerMonth }
+  function summarizeDelivery(sessions, opts) {
+    opts = opts || {}; sessions = sessions || [];
+    var today = opts.today || todayISO(), year = opts.year || '', month = opts.month || '';
+    var perMonth = opts.targetPerMonth == null ? TARGET_PROGRAMS_PER_MONTH : opts.targetPerMonth;
+    var roster = opts.roster || [], rosterIdx = {};
+    roster.forEach(function (n) { rosterIdx[normName(n)] = n; });
+
+    var undated = sessions.filter(function (s) { return !s.date; }).length;
+    var rows = sessions.filter(function (s) {
+      if (!year && !month) return true;
+      if (!s.date) return false;
+      return (!year || s.date.slice(0, 4) === year) && (!month || s.date.slice(5, 7) === month);
+    });
+    var by = { PLANNED: 0, CONDUCTED: 0, POSTPONED: 0, CANCELLED: 0 };
+    rows.forEach(function (s) { if (s.status in by) by[s.status]++; });
+
+    // "Due" = should have been delivered by now: Conducted, or not cancelled and dated today or earlier.
+    var due = rows.filter(function (s) { return s.status !== 'CANCELLED' && (s.status === 'CONDUCTED' || (s.date && s.date <= today)); });
+    var overdue = due.filter(function (s) { return s.status !== 'CONDUCTED'; }).length;
+    var upcoming = rows.filter(function (s) { return s.status === 'PLANNED' && s.date && s.date > today; }).length;
+
+    var conducted = rows.filter(function (s) { return s.status === 'CONDUCTED'; });
+    var targetPax = 0, targetPaxN = 0;
+    rows.forEach(function (s) { if (s.status !== 'CANCELLED' && isNum(s.targetPax)) { targetPax += s.targetPax; targetPaxN++; } });
+    var actualPax = 0, actualPaxN = 0, fillA = 0, fillT = 0, hours = 0, hoursN = 0, ptSum = 0, ptN = 0;
+    conducted.forEach(function (s) {
+      if (isNum(s.actualPax)) { actualPax += s.actualPax; actualPaxN++; if (isNum(s.targetPax) && s.targetPax > 0) { fillA += s.actualPax; fillT += s.targetPax; } }
+      if (isNum(s.durationHrs)) { hours += s.durationHrs; hoursN++; }
+      if (isNum(s.postTestAvg)) { ptSum += s.postTestAvg; ptN++; }
+    });
+
+    var months = monthsInPeriod(year, month, today), required = months == null ? null : perMonth * months;
+    var facMap = {};
+    rows.forEach(function (s) {
+      (s.facilitators || []).forEach(function (n) {
+        var k = normName(n); if (!k) return;
+        var f = facMap[k] || (facMap[k] = { name: rosterIdx[k] || n, onRoster: !!rosterIdx[k], planned: 0, conducted: 0, postponed: 0, cancelled: 0, actualPax: 0 });
+        f[s.status.toLowerCase()]++;
+        if (s.status === 'CONDUCTED' && isNum(s.actualPax)) f.actualPax += s.actualPax;
+      });
+    });
+    var facilitators = Object.keys(facMap).sort().map(function (k) {
+      var f = facMap[k];
+      f.required = required;
+      f.ratingPct = required ? round2(Math.min(f.conducted / required, 1) * 100) : null;   // capped at 100%, as kpi.js does
+      return f;
+    });
+    var withSessions = {}; Object.keys(facMap).forEach(function (k) { withSessions[k] = 1; });
+
+    return {
+      period: { year: year, month: month, today: today },
+      hasData: rows.length > 0,
+      total: rows.length, undated: undated,
+      byStatus: by,
+      due: due.length, overdue: overdue, upcoming: upcoming,
+      deliveryRatePct: due.length ? round2(conducted.length / due.length * 100) : null,   // null = nothing was due, not 0%
+      targetPax: targetPaxN ? targetPax : null,
+      actualPax: actualPaxN ? actualPax : null,
+      paxFillPct: fillT ? round2(fillA / fillT * 100) : null,
+      hoursConducted: hoursN ? hours : null,
+      postTest: { avgPct: ptN ? round2(ptSum / ptN) : null, sessions: ptN },               // unweighted mean of session averages
+      programsRequiredPerFacilitator: required,
+      targetPerMonth: perMonth,
+      facilitators: facilitators,
+      rosterWithoutSessions: roster.filter(function (n) { return !withSessions[normName(n)]; })
+    };
+  }
+
   return {
     SESSION_STATUSES: SESSION_STATUSES, TRANSITIONS: TRANSITIONS, FAC_STATUSES: FAC_STATUSES, WORK_LOCATIONS: WORK_LOCATIONS,
     LEAVE_TYPES: LEAVE_TYPES, BRANDS: BRANDS, TRAINING_TYPES: TRAINING_TYPES,
     labelOf: labelOf, codeOf: codeOf, facStatus: facStatus, canTransition: canTransition, normName: normName,
     parseDate: parseDate, parseTime: parseTime,
+    TARGET_PROGRAMS_PER_MONTH: TARGET_PROGRAMS_PER_MONTH, todayISO: todayISO, sessionYears: sessionYears, summarizeDelivery: summarizeDelivery,
     validateSession: validateSession, validateFacilitatorAttendance: validateFacilitatorAttendance, computeKra: computeKra
   };
 });

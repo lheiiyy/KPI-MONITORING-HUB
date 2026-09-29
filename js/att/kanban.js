@@ -3,7 +3,7 @@
 // and persists via the adapter. The UI updates optimistically and rolls back on failure.
 (function () {
   var A = window.ATT, D = A.domain, S = A.service, U = A.ui, el = U.el;
-  var state = { sessions: [], ref: { teamMembers: [], sessionFacilitators: [] }, f: { month: '', brand: '', who: '', q: '' }, dragId: null };
+  var state = { sessions: [], ref: { teamMembers: [], sessionFacilitators: [] }, f: { year: '', month: '', brand: '', who: '', q: '' }, dragId: null, busy: {}, loaded: false };
   var boardEl = document.getElementById('board'), dlg = document.getElementById('dlg');
 
   function byId(id) { return state.sessions.filter(function (s) { return s.id === id; })[0]; }
@@ -11,6 +11,7 @@
   function pax(s) { return s.actualPax != null || s.targetPax != null ? (s.actualPax == null ? '–' : s.actualPax) + ' / ' + (s.targetPax == null ? '–' : s.targetPax) + ' pax' : ''; }
   function visible(s) {
     var f = state.f;
+    if (f.year && (s.date || '').slice(0, 4) !== f.year) return false;
     if (f.month && (s.date || '').slice(0, 7) !== f.month) return false;
     if (f.brand && s.brand !== f.brand) return false;
     if (f.who && (s.facilitators || []).map(D.normName).indexOf(D.normName(f.who)) < 0) return false;
@@ -20,8 +21,26 @@
   function cmp(a, b) { return (a.date || '9999') < (b.date || '9999') ? -1 : (a.date || '9999') > (b.date || '9999') ? 1 : a.id < b.id ? -1 : 1; }
 
   // ---------------------------------------------------------------- board
+  // Live summary of what is currently shown, derived from the same records as the cards.
+  function renderSummary() {
+    var box = document.getElementById('summary'); if (!box) return;
+    var shown = state.sessions.filter(visible), r = D.summarizeDelivery(shown, { today: D.todayISO() });
+    box.textContent = '';
+    function stat(label, val, key) { return el('div', { class: 'stat', 'data-stat': key }, [el('span', { class: 'k', text: label }), el('span', { class: 'v', text: String(val) })]); }
+    box.appendChild(stat('Sessions', r.total, 'total'));
+    D.SESSION_STATUSES.forEach(function (st) { box.appendChild(stat(st.label, r.byStatus[st.code], st.code)); });
+    box.appendChild(stat('Overdue', r.overdue, 'overdue'));
+    box.appendChild(stat('Actual / target pax', (r.actualPax == null ? '–' : r.actualPax) + ' / ' + (r.targetPax == null ? '–' : r.targetPax), 'pax'));
+  }
+
   function render() {
+    renderSummary();
     boardEl.textContent = '';
+    if (state.loaded && !state.sessions.length) {
+      boardEl.appendChild(el('div', { class: 'emptyboard', role: 'status' }, [
+        el('strong', { text: 'No training sessions have been logged yet.' }),
+        el('span', { text: ' The SESSION_LOG template has pre-numbered rows but no sessions; use “New session” to schedule the first one.' })]));
+    }
     D.SESSION_STATUSES.forEach(function (st) {
       var list = state.sessions.filter(function (s) { return s.status === st.code && visible(s); }).sort(cmp);
       var cards = el('div', { class: 'cards' }, list.length ? list.map(card) : [el('div', { class: 'empty', text: 'No sessions' })]);
@@ -45,10 +64,10 @@
 
   function card(s) {
     var next = D.TRANSITIONS[s.status] || [];
-    var sel = el('select', { 'aria-label': 'Move ' + s.id + ' to', disabled: !next.length, onchange: function () { if (sel.value) move(s, sel.value); sel.value = ''; } },
+    var sel = el('select', { 'aria-label': 'Move ' + s.id + ' to', disabled: !next.length || !!state.busy[s.id], onchange: function () { if (sel.value) move(s, sel.value); sel.value = ''; } },
       [el('option', { value: '', text: next.length ? 'Move to…' : 'Final' })].concat(next.map(function (c) { return el('option', { value: c, text: D.labelOf(D.SESSION_STATUSES, c) }); })));
     var meta = [fmtDate(s.date), s.brand ? D.labelOf(D.BRANDS, s.brand) : '', s.venue].filter(Boolean).join(' · ');
-    var c = el('article', { class: 'card', draggable: 'true', tabindex: '0', 'data-id': s.id }, [
+    var c = el('article', { class: 'card', draggable: state.busy[s.id] ? 'false' : 'true', tabindex: '0', 'data-id': s.id }, [
       el('div', { class: 'id', text: s.id + (s.trainingType ? ' · ' + D.labelOf(D.TRAINING_TYPES, s.trainingType) : '') }),
       el('div', { class: 't', text: s.program || '(untitled)' }),
       el('div', { class: 'm', text: meta }),
@@ -66,19 +85,27 @@
     var i = state.sessions.map(function (x) { return x.id; }).indexOf(saved.id);
     if (i < 0) state.sessions.push(saved); else state.sessions[i] = saved;
   }
-  function reload() { return S.listSessions().then(function (l) { state.sessions = l; render(); }); }
+  function reload() { return S.listSessions().then(function (l) { state.sessions = l; state.loaded = true; render(); }); }
 
-  // Optimistic status change with rollback. A Conducted session needs a date, so ask for it first.
+  // Status change. Order of events: (1) validate the transition locally, (2) show the move,
+  // (3) write it to the data source, (4) replace the card with what the source returned,
+  // (5) on ANY failure put the card back and, when the outcome is unknown (network/server),
+  // re-read the source of truth instead of assuming the write did not happen.
   function move(s, to) {
-    if (!D.canTransition(s.status, to)) { U.toast('A ' + D.labelOf(D.SESSION_STATUSES, s.status) + ' session cannot become ' + D.labelOf(D.SESSION_STATUSES, to) + '.', true); return; }
+    if (state.busy[s.id]) { U.toast(s.id + ' is still saving. Wait a moment.', true); return; }
+    if (!D.canTransition(s.status, to)) { U.toast('A ' + D.labelOf(D.SESSION_STATUSES, s.status) + ' session cannot become ' + D.labelOf(D.SESSION_STATUSES, to) + '.', true); render(); return; }
     if (to === 'CONDUCTED' && !s.date) { openDialog(s.id, { moveTo: to }); U.toast('Enter the session date to mark it Conducted.'); return; }
     var prev = Object.assign({}, s);
+    state.busy[s.id] = true;
     replace(Object.assign({}, s, { status: to })); render();
     S.moveSession(s.id, to, { expectedVersion: s.version }).then(function (saved) {
-      replace(saved); render(); U.toast(s.id + ' → ' + D.labelOf(D.SESSION_STATUSES, to));
+      delete state.busy[s.id]; replace(saved); render();
+      U.toast(A.connected ? s.id + ' → ' + D.labelOf(D.SESSION_STATUSES, to) + ' (saved to the sheet)' : s.id + ' → ' + D.labelOf(D.SESSION_STATUSES, to) + ' — NOT SAVED: not connected to the sheet', !A.connected);
     }).catch(function (e) {
-      replace(prev); render(); U.fail(e);
-      if (e && e.code === 'CONFLICT') reload().catch(U.fail);
+      delete state.busy[s.id]; replace(prev); render(); U.fail(e);
+      if (e && (e.code === 'CONFLICT' || e.code === 'NETWORK' || e.code === 'SERVER')) {
+        reload().then(initFilters).catch(function () { U.toast('Could not confirm the current state with the sheet. Reload before relying on the board.', true); });
+      }
     });
   }
 
@@ -164,7 +191,11 @@
 
   // ---------------------------------------------------------------- filters and startup
   function initFilters() {
-    var months = {}; state.sessions.forEach(function (s) { if (s.date) months[s.date.slice(0, 7)] = 1; });
+    var yrs = D.sessionYears(state.sessions, D.todayISO());
+    var y = document.getElementById('f-year'); y.textContent = '';
+    y.appendChild(el('option', { value: '', text: 'All years' })); yrs.forEach(function (k) { y.appendChild(el('option', { value: k, text: k })); });
+    y.value = state.f.year;
+    var months = {}; state.sessions.forEach(function (s) { if (s.date && (!state.f.year || s.date.slice(0, 4) === state.f.year)) months[s.date.slice(0, 7)] = 1; });
     var m = document.getElementById('f-month'); m.textContent = '';
     m.appendChild(el('option', { value: '', text: 'All months' }));
     Object.keys(months).sort().forEach(function (k) { m.appendChild(el('option', { value: k, text: k })); });
@@ -173,14 +204,14 @@
     var w = document.getElementById('f-who'); w.textContent = ''; w.appendChild(el('option', { value: '', text: 'All facilitators' }));
     state.ref.sessionFacilitators.forEach(function (n) { w.appendChild(el('option', { value: n, text: n })); });
   }
-  ['month', 'brand', 'who'].forEach(function (k) { document.getElementById('f-' + k).addEventListener('change', function (e) { state.f[k] = e.target.value; render(); }); });
+  ['year', 'month', 'brand', 'who'].forEach(function (k) { document.getElementById('f-' + k).addEventListener('change', function (e) { state.f[k] = e.target.value; if (k === 'year') { state.f.month = ''; initFilters(); } render(); }); });
   document.getElementById('f-q').addEventListener('input', function (e) { state.f.q = e.target.value; render(); });
   document.getElementById('new').addEventListener('click', function () { openDialog(null); });
-  document.getElementById('reload').addEventListener('click', function () { reload().then(initFilters).catch(U.fail); });
+  document.getElementById('reload').addEventListener('click', function () { reload().then(initFilters).catch(function (e) { U.fail(e); boardEl.textContent = 'Could not load the schedule from the data source. Use Reload to retry.'; }); });
 
   U.banner(document.getElementById('banner'));
   Promise.all([S.reference(), S.listSessions()]).then(function (r) {
-    state.ref = r[0]; state.sessions = r[1]; initFilters(); render();
+    state.ref = r[0]; state.sessions = r[1]; state.loaded = true; initFilters(); render();
     if (!state.sessions.length) U.toast(A.connected ? 'No sessions scheduled yet. Use "New session" to add the first one.' : 'Empty board. Use "New session" to try it out.');
-  }).catch(function (e) { U.fail(e); boardEl.textContent = 'Could not load the schedule.'; });
+  }).catch(function (e) { U.fail(e); boardEl.textContent = 'Could not load the schedule from the data source. Nothing is shown rather than showing stale or invented data. Use Reload to retry.'; });
 })();

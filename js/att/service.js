@@ -110,6 +110,18 @@
         });
       },
 
+      // Training delivery report, derived from the live session records (never stored).
+      // filter: { year:'2026'|'', month:'01'..'12'|'', today?, targetPerMonth? }
+      deliveryReport: function (filter) {
+        filter = filter || {};
+        return Promise.all([adapter.listSessions(), reference().catch(function () { return { sessionFacilitators: [] }; })]).then(function (r) {
+          var today = filter.today || D.todayISO();
+          var out = D.summarizeDelivery(r[0], { year: filter.year, month: filter.month, today: today, roster: r[1].sessionFacilitators || [], targetPerMonth: filter.targetPerMonth });
+          out.years = D.sessionYears(r[0], today);
+          return out;
+        });
+      },
+
       // Non-blocking: double-booked facilitators, and facilitators marked off on that date.
       // Names are matched after normalisation; the two sheets can spell a person differently,
       // so an unmatched name yields no warning rather than a false one.
