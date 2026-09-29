@@ -1,0 +1,6 @@
+{
+  "name": "kpi-monitoring-hub",
+  "private": true,
+  "description": "Static KPI hub. package.json exists only to run the scheduling/attendance tests; there is no build step.",
+  "scripts": { "test": "node --test test/att.test.js" }
+}

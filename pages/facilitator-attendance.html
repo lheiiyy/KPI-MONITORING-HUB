@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Facilitator Daily Attendance &mdash; KPI Monitoring Initiative</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../css/att.css">
+</head><body>
+<div class="wrap">
+  <a class="kraNav" href="attendance.html">&larr; Attendance / Punctuality / Behavior (10%)</a>
+  <header>
+    <div class="eyebrow">Training &amp; Development Division · Attendance KRA</div>
+    <h1>Facilitator Daily Attendance</h1>
+    <p class="sub">One row per team member per working day, saved to <b>TDD Team Attendance Monitoring 2026</b>. Late means
+      arriving after the official start time. Leave Type only applies when Status is On Leave. This is each person's own
+      work attendance, separate from who attended a training session.</p>
+  </header>
+  <div id="banner" class="banner off" role="status"></div>
+  <div class="bar"><label>Date<input id="day" type="date"></label></div>
+  <section class="panel">
+    <table>
+      <thead><tr><th>Team member</th><th>Status</th><th>Time in</th><th>Time out</th><th>Work location</th><th>Leave type</th><th>Remarks</th><th></th></tr></thead>
+      <tbody id="rows"><tr><td colspan="8" class="muted">Loading…</td></tr></tbody>
+    </table>
+  </section>
+  <section class="panel">
+    <h2>Monthly KRA for the selected month</h2>
+    <p class="sub">(Days present &minus; Lates &minus; Absences) &divide; Working days, floored at 0. Rest Day, Holiday and On Leave are not working days;
+      Half Day counts as half a day present. These treatments are defaults pending HRAD confirmation.</p>
+    <div id="kra"></div>
+  </section>
+</div>
+<div id="toasts" aria-live="polite"></div>
+<script src="../js/att/errors.js"></script>
+<script src="../js/att/domain.js"></script>
+<script src="../js/att/service.js"></script>
+<script src="../js/att/adapters/memory.js"></script>
+<script src="../js/att/adapters/sheets.js"></script>
+<script src="../js/att/config.js"></script>
+<script src="../js/att/boot.js"></script>
+<script src="../js/att/ui.js"></script>
+<script src="../js/att/facday.js"></script>
+</body></html>
