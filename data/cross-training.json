@@ -1,0 +1,50 @@
+{
+    "rows": [
+        {
+            "brand": "ANGELS PIZZA",
+            "month": "2026-07-01",
+            "failed": 0,
+            "passed": 0,
+            "validations": 1,
+            "avg_exam_grade": 69.00,
+            "avg_tech_val_grade": 94.00
+        },
+        {
+            "brand": "ANGELS PIZZA",
+            "month": "2026-08-01",
+            "failed": 1,
+            "passed": 0,
+            "validations": 9,
+            "avg_exam_grade": 89.13,
+            "avg_tech_val_grade": 87.29
+        },
+        {
+            "brand": "FIGARO",
+            "month": "2026-08-01",
+            "failed": 0,
+            "passed": 0,
+            "validations": 3,
+            "avg_exam_grade": 89.00,
+            "avg_tech_val_grade": 94.33
+        },
+        {
+            "brand": "ANGELS PIZZA",
+            "month": "2026-09-01",
+            "failed": 0,
+            "passed": 0,
+            "validations": 10,
+            "avg_exam_grade": 93.88,
+            "avg_tech_val_grade": 93.88
+        },
+        {
+            "brand": "FIGARO",
+            "month": "2026-09-01",
+            "failed": 0,
+            "passed": 0,
+            "validations": 4,
+            "avg_exam_grade": null,
+            "avg_tech_val_grade": 77.50
+        }
+    ],
+    "generated_at": "2026-09-29T07:45:41.390189+00:00"
+}

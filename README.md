@@ -91,6 +91,14 @@ folder: https://drive.google.com/drive/folders/1YBnR_TIvEhNh4uDXyqyTy0RKejOFQbSq
   - TDD Team Attendance Monitoring 2026 (facilitator's own attendance —
     this is the one the Attendance KRA page links to)
 
+## Cross-training data (database-backed)
+
+`pages/staff-proficiency.html` reads `data/cross-training.json`, a names-free
+export of the `v_cross_training_monthly` view in `TddProjectai/database`
+(migration `013_cross_training.sql`; refresh with
+`database/scripts/export_cross_training.sh`). Source of truth is the
+native Google Sheet "CROSS TRAINED STAFFS MONITORING (COPY - NATIVE)".
+
 ## Status / next steps
 
 This is a static, repo-tracked snapshot of the KRA scorecard system —

@@ -65,6 +65,12 @@ dd{margin:0}
     </dl>
   </section>
 
+  <section class="panel" id="ctPanel">
+    <h2>Cross-training validations by month</h2>
+    <p class="sub" id="ctMeta">Loading&hellip;</p>
+    <div style="overflow-x:auto"><table id="ctTable" style="width:100%;border-collapse:collapse;font-size:13px"></table></div>
+  </section>
+
   <section class="panel notes">
     <h2>Data source</h2>
     <p>This is an executive summary only &mdash; certification records are logged per store visit in the
@@ -88,4 +94,18 @@ dd{margin:0}
     </div>
   </section>
 </div>
+<script>
+(function(){
+  var meta=document.getElementById('ctMeta'), t=document.getElementById('ctTable');
+  function esc(v){return String(v).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]});}
+  function n(v){return v==null?'&ndash;':esc(v);}
+  fetch('../data/cross-training.json').then(function(r){if(!r.ok)throw 0;return r.json();}).then(function(d){
+    var rows=d.rows||[], total=rows.reduce(function(a,r){return a+r.validations;},0);
+    meta.textContent=total+' validations, aggregated only (no staff names). Exported from the database view v_cross_training_monthly on '+String(d.generated_at).slice(0,10)+'.';
+    var h='<tr style="text-align:left;color:var(--muted)"><th>Month</th><th>Brand</th><th>Validations</th><th>Avg tech grade</th><th>Avg exam grade</th></tr>';
+    rows.forEach(function(r){h+='<tr style="border-top:1px solid var(--line)"><td>'+esc(String(r.month).slice(0,7))+'</td><td>'+esc(r.brand)+'</td><td>'+n(r.validations)+'</td><td>'+n(r.avg_tech_val_grade)+'</td><td>'+n(r.avg_exam_grade)+'</td></tr>';});
+    t.innerHTML=h;
+  }).catch(function(){meta.textContent='Cross-training data is unavailable right now.';});
+})();
+</script>
 </body></html>
