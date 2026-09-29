@@ -39,9 +39,11 @@ matters, move back to the Netlify (or equivalent) server-side gate
 once credits/budget allow, or make the repo's audience otherwise
 trusted (private distribution of the link only).
 
-> **Correction:** at the time of the scheduling/attendance work, none of the pages in this
-> checkout contained the client-side password prompt described above, so the site is
-> effectively public to anyone with the URL. The new pages add no gate of their own.
+> **Note on access control:** the pages in this repo contain no client-side password prompt, so the
+> paragraph above is out of date. Per `SYSTEM_AUDIT.md` in `lheiiyy/TddProjectai`, the live Netlify
+> site (`tnddkpi`) is gated server-side by `netlify/edge-functions/basic-auth.js`, with credentials in the
+> `PILOT_USER` / `PILOT_PASSWORD` environment variables. That was not independently re-verified while
+> building the scheduling pages. The new pages add no gate of their own and rely on that one.
 
 ## Schedule board & facilitator attendance (write-capable)
 
