@@ -53,6 +53,11 @@ dd{margin:0}
   <div id="kraMount"></div>
 
   <section class="panel">
+    <h2>Live delivery report</h2>
+    <div id="deliveryReport">Loading…</div>
+  </section>
+
+  <section class="panel">
     <h2>How this KRA is scored</h2>
     <dl>
       <dt>Formula</dt><dd>Programs Delivered / Programs Required &times; 100%</dd>
@@ -66,10 +71,19 @@ dd{margin:0}
       facilitator(s), target/actual pax, duration, status, and post-test average &mdash; in the
       <b>Training Program &amp; Delivery Monitoring 2026</b> sheet, in the <b>KPI Data sheet (Pilot)</b> Drive
       folder.</p>
-    <p><a href="https://docs.google.com/spreadsheets/d/1mp4-6KHcX5iDB5Oto1Smjfyq-xW4KAZCC8CA09hhpB4/edit" target="_blank" rel="noopener">Open the training program log &rarr;</a></p>
+    <p><a href="schedule.html"><b>Open the schedule board &rarr;</b></a> (drag sessions Planned &rarr; Conducted; saves to the sheet below)
+      &nbsp;·&nbsp; <a href="https://docs.google.com/spreadsheets/d/1mp4-6KHcX5iDB5Oto1Smjfyq-xW4KAZCC8CA09hhpB4/edit" target="_blank" rel="noopener">Open the training program log &rarr;</a></p>
   </section>
 
 </div>
+<script src="../js/att/errors.js"></script>
+<script src="../js/att/domain.js"></script>
+<script src="../js/att/service.js"></script>
+<script src="../js/att/adapters/memory.js"></script>
+<script src="../js/att/adapters/sheets.js"></script>
+<script src="../js/att/config.js"></script>
+<script src="../js/att/boot.js"></script>
+<script src="../js/att/delivery-report.js"></script>
 <script src="../js/kpi.js"></script>
 <script>KPI.mountKra(document.getElementById("kraMount"),"training_delivery");</script>
 </body></html>

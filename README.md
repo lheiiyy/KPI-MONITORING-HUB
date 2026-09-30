@@ -39,6 +39,33 @@ matters, move back to the Netlify (or equivalent) server-side gate
 once credits/budget allow, or make the repo's audience otherwise
 trusted (private distribution of the link only).
 
+> **Note on access control:** the pages in this repo contain no client-side password prompt, so the
+> paragraph above is out of date. Per `SYSTEM_AUDIT.md` in `lheiiyy/TddProjectai`, the live Netlify
+> site (`tnddkpi`) is gated server-side by `netlify/edge-functions/basic-auth.js`, with credentials in the
+> `PILOT_USER` / `PILOT_PASSWORD` environment variables. That was not independently re-verified while
+> building the scheduling pages. The new pages add no gate of their own and rely on that one.
+
+## Schedule board & facilitator attendance (write-capable)
+
+Two pages read **and write** the pilot Google Sheets, through an Apps Script API:
+
+- **`pages/schedule.html`** — Kanban of training sessions (`SESSION_LOG`). Columns are the sheet's own
+  statuses: Planned, Conducted, Postponed, Cancelled. Drag a card (or use *Move to…*) to change status;
+  Planned → Conducted / Postponed / Cancelled, Postponed → Planned / Cancelled, Conducted and Cancelled are final.
+  Sessions can be created and edited; a Conducted session needs a date. Updates are optimistic and roll back if the save fails.
+- **`pages/facilitator-attendance.html`** — daily attendance of facilitators / trainers / T&D team members (one row per
+  person per day) with the monthly Attendance KRA. Trainee attendance is out of scope.
+
+```
+Pages (Kanban / daily attendance)  →  js/att/service.js (rules)  →  adapter  →  Apps Script  →  Google Sheets
+                                                                   └ memory (tests / not connected)
+                                                                   └ future: PostgreSQL (TddProjectai/database/migrations/014)
+```
+
+Until `js/att/config.js` has an `apiUrl` and `token` the pages run **not connected**: they work in memory and save nothing
+(a banner says so). Setup, sheet rules and the security caveat: [`apps-script/README.md`](apps-script/README.md).
+Run the tests with `npm test`. The KRA numbers on the other pages are still the static monthly snapshot; they do not yet read this live data.
+
 ## Pages
 
 - **`index.html`** — the landing page. Not a dashboard itself: five nav

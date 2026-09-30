@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Training Schedule Board &mdash; KPI Monitoring Initiative</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="../css/att.css">
+</head><body>
+<div class="wrap">
+  <a class="kraNav" href="../index.html">&larr; KPI Monitoring Initiative &middot; Training schedule</a>
+  <header>
+    <div class="eyebrow">Training &amp; Development Division · Schedule &amp; monitoring</div>
+    <h1>Training Schedule Board</h1>
+    <p class="sub">One card per training session from <b>SESSION_LOG</b>. Drag a card to a new column, or use its
+      <b>Move to…</b> menu. Planned sessions become Conducted; a Planned session can also be Postponed or Cancelled,
+      and a Postponed one can be re-planned. Conducted and Cancelled are final.</p>
+  </header>
+  <div id="banner" class="banner off" role="status"></div>
+  <div class="bar">
+    <label>Year<select id="f-year"></select></label>
+    <label>Month<select id="f-month"></select></label>
+    <label>Brand<select id="f-brand"></select></label>
+    <label>Facilitator<select id="f-who"></select></label>
+    <label>Search<input id="f-q" type="search" placeholder="Program, ID or venue"></label>
+    <span class="spacer"></span>
+    <button id="reload" type="button">Reload</button>
+    <button id="new" type="button" class="primary">New session</button>
+  </div>
+  <div id="summary" class="summary" aria-label="Summary of the sessions shown"></div>
+  <div id="board" class="board" aria-live="polite">Loading…</div>
+  <p class="sub"><a href="facilitator-attendance.html">Facilitator daily attendance &rarr;</a> (the Attendance KRA: facilitators,
+    trainers and Training &amp; Development team members).</p>
+</div>
+<dialog id="dlg" aria-label="Training session"></dialog>
+<div id="toasts" aria-live="polite"></div>
+<script src="../js/att/errors.js"></script>
+<script src="../js/att/domain.js"></script>
+<script src="../js/att/service.js"></script>
+<script src="../js/att/adapters/memory.js"></script>
+<script src="../js/att/adapters/sheets.js"></script>
+<script src="../js/att/config.js"></script>
+<script src="../js/att/boot.js"></script>
+<script src="../js/att/ui.js"></script>
+<script src="../js/att/kanban.js"></script>
+</body></html>
