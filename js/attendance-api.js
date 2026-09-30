@@ -16,8 +16,7 @@
 
     function call(action, params) {
       if (!opts.url) return Promise.reject(AttendanceApiError('CONFIG_MISSING', 'The Attendance API is not configured. Set apiUrl in js/attendance-config.js.'));
-      var token = opts.getToken && opts.getToken();
-      if (!token) return Promise.reject(AttendanceApiError('UNAUTHORIZED', 'Enter your access token to continue.'));
+      var token = (opts.getToken && opts.getToken()) || '';
       var body = JSON.stringify(Object.assign({ action: action, token: token }, params || {}));
       var ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
       var timer = ctl ? setTimeout(function () { ctl.abort(); }, timeoutMs) : null;

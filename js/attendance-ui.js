@@ -47,7 +47,7 @@
     }
     function connect() {
       if (!cfg.apiUrl) { app.hidden = true; tokenBox.hidden = true; banner('off', 'Not configured: the attendance API address (apiUrl in js/attendance-config.js) is empty, so no attendance can be loaded or saved. Nothing is shown because nothing is available.'); return; }
-      if (!getToken()) { banner('off', 'Enter your access token to load attendance.'); needToken(''); return; }
+      tokenBox.hidden = true;
       banner('info', 'Connecting…');
       S.api.getMeta().then(function (meta) {
         S.meta = meta; S.canWrite = meta.role === 'write';

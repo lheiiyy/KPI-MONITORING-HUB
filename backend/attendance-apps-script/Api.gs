@@ -1,8 +1,16 @@
 /**
- * HTTP entry points. Deployed "Execute as: Me / Access: Anyone", so the URL is public and EVERY data call must
- * carry a per-user token, verified against SHA-256 hashes kept in Script Properties (never in the repo, never in
- * client code). This is the same model as the Activity module. Body is POST text/plain JSON {action, token, ...params}.
- * Responses: {ok:true,data} | {ok:false,error:{code,message,details}}
+ * HTTP entry points. Deployed "Execute as: Me / Access: Anyone", so the URL is public.
+ * Per-user token auth (SHA-256 hashes in Script Properties) was removed at the product
+ * owner's explicit request: the site's own front-door password (a separate, client-side
+ * gate on the static pages) is the only access control now. This means the /exec URL
+ * itself - visible in this app's page source to any visitor - accepts unauthenticated
+ * read AND write calls from anyone who has it, independent of that front-door gate.
+ * Every write is now attributed to a fixed "Pilot" user rather than a real person, so
+ * ATTENDANCE_AUDIT no longer identifies who made a given change.
+ * addAttendanceUser/listAttendanceUsers/revokeAttendanceUser (Setup.gs) still work but
+ * no longer affect access - restore the attAuthenticate_ body below to re-enable them.
+ * Body is POST text/plain JSON {action, token, ...params}. Responses:
+ * {ok:true,data} | {ok:false,error:{code,message,details}}
  */
 function attSha256Hex_(s) {
   return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, s, Utilities.Charset.UTF_8)
@@ -10,14 +18,7 @@ function attSha256Hex_(s) {
 }
 
 function attAuthenticate_(token) {
-  var raw = PropertiesService.getScriptProperties().getProperty('ATTENDANCE_TOKENS');
-  if (!raw) throw attFail_('CONFIG_MISSING', 'API access is not configured yet. An administrator must run addAttendanceUser() in the Apps Script editor.');
-  var users;
-  try { users = JSON.parse(raw); } catch (e) { throw attFail_('CONFIG_MISSING', 'ATTENDANCE_TOKENS script property is corrupt.'); }
-  if (attBlank_(token) || typeof token !== 'string') throw attFail_('UNAUTHORIZED', 'An access token is required.');
-  var u = users[attSha256Hex_(token.trim())];
-  if (!u) throw attFail_('UNAUTHORIZED', 'The access token is not valid.');
-  return { user: u.user, role: u.role === 'write' ? 'write' : 'read' };
+  return { user: 'Pilot', role: 'write' };
 }
 
 var ATT_ACTIONS = {
