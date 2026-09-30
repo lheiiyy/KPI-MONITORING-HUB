@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "scope": "Training & Development team members who appear in the TDD Team Attendance Monitoring 2026 sheet (LISTS!TEAM MEMBER).",
+  "how_to_read": "person_id reuses the hub roster ids (CONFIG_VISITORS in data/kpi-monthly.json) wherever the repo already defines one. Each name is tagged CONFIRMED (exact repo/sheet spelling or an explicit mapping in the repo) or PROPOSED (a plausible match that no repo file or administrator has confirmed). Names are never matched by similarity at run time: only the names listed here resolve. The first name of each person is the spelling used in the attendance sheet's LISTS tab and is what the sheet stores.",
+  "people": [
+    { "person_id": "GIO", "names": [
+      { "name": "Geoffrey Carranceja", "status": "CONFIRMED", "basis": "Exact match: attendance LISTS, hub roster, Training Program LISTS." } ] },
+    { "person_id": "DANIEL", "names": [
+      { "name": "Daniel De Leon", "status": "CONFIRMED", "basis": "Exact match across attendance LISTS and hub roster." } ] },
+    { "person_id": "ALEX", "names": [
+      { "name": "Alex Rivera", "status": "CONFIRMED", "basis": "Exact match across attendance LISTS and hub roster." } ] },
+    { "person_id": "RICE", "names": [
+      { "name": "Ricelle Lim", "status": "PROPOSED", "basis": "Attendance LISTS spelling. Differs from hub roster spelling; link to id RICE not confirmed by any repo file." },
+      { "name": "Ricelle (Rice) Lim", "status": "CONFIRMED", "basis": "Hub roster display name for id RICE (scripts/build_kpi_monthly.py ROSTER)." },
+      { "name": "Rice Lim", "status": "CONFIRMED", "basis": "Explicit mapping RICE LIM -> RICE in scripts/build_kpi_monthly.py DEPT." } ] },
+    { "person_id": "JAMES", "names": [
+      { "name": "James Nacionales", "status": "CONFIRMED", "basis": "Exact match across attendance LISTS and hub roster." } ] },
+    { "person_id": "JOSH", "names": [
+      { "name": "Josh Earnshaw", "status": "CONFIRMED", "basis": "Exact match across attendance LISTS and hub roster." } ] },
+    { "person_id": "NICA", "names": [
+      { "name": "Nica Tardio", "status": "CONFIRMED", "basis": "Exact match: attendance LISTS and Training Program LISTS. Id NICA is named in scripts/build_kpi_monthly.py; she is not on the Store Visit roster." } ] },
+    { "person_id": "CHARLIE", "names": [
+      { "name": "Charlie Moises", "status": "CONFIRMED", "basis": "Exact match across attendance LISTS and hub roster." } ] },
+    { "person_id": "LEO", "names": [
+      { "name": "Leo Fernandez", "status": "CONFIRMED", "basis": "Exact match across attendance LISTS and hub roster." } ] },
+    { "person_id": "ANN", "names": [
+      { "name": "Ann Barredo", "status": "CONFIRMED", "basis": "Exact match across attendance LISTS and hub roster." },
+      { "name": "Ann", "status": "CONFIRMED", "basis": "Short form seen in the cross-training sheet (scripts/build_kpi_monthly.py DEPT comment: 'ANN' vs 'ANN BARREDO')." } ] },
+    { "person_id": "YANA", "names": [
+      { "name": "Alliana Papa", "status": "PROPOSED", "basis": "Attendance LISTS spelling. Differs from hub roster spelling; link to id YANA not confirmed by any repo file." },
+      { "name": "Alliana (Yana) Papa", "status": "CONFIRMED", "basis": "Hub roster display name for id YANA." },
+      { "name": "Alliana Kristine", "status": "CONFIRMED", "basis": "Explicit mapping ALLIANA KRISTINE -> YANA in scripts/build_kpi_monthly.py DEPT." } ] },
+    { "person_id": "VER", "names": [
+      { "name": "Jeliver Guerrero", "status": "PROPOSED", "basis": "Attendance LISTS spelling. The repo only knows this person as 'Ver Guerrero'; link to id VER not confirmed by any repo file." },
+      { "name": "Ver Guerrero", "status": "CONFIRMED", "basis": "Hub roster display name for id VER; explicit mapping VER GUERRERO -> VER in scripts/build_kpi_monthly.py DEPT." } ] }
+  ],
+  "not_in_attendance_roster": [
+    { "person_id": "SKY", "note": "On the hub roster and the Training Program facilitator list but absent from the attendance sheet's TEAM MEMBER list. Open question for the module owner: is Sky a T&D team member whose attendance is tracked?" }
+  ]
+}

@@ -1,43 +1,76 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Facilitator Daily Attendance &mdash; KPI Monitoring Initiative</title>
+<title>Facilitator / T&amp;D Attendance &mdash; KPI Monitoring Initiative</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="../css/att.css">
+<link rel="stylesheet" href="../css/attendance.css">
 </head><body>
 <div class="wrap">
   <a class="kraNav" href="attendance.html">&larr; Attendance / Punctuality / Behavior (10%)</a>
   <header>
     <div class="eyebrow">Training &amp; Development Division · Attendance KRA</div>
-    <h1>Facilitator Daily Attendance</h1>
-    <p class="sub">One row per team member per working day, saved to <b>TDD Team Attendance Monitoring 2026</b>. Late means
-      arriving after the official start time. Leave Type only applies when Status is On Leave. This is each person's own
-      work attendance, separate from who attended a training session.</p>
+    <h1>Facilitator / T&amp;D Attendance</h1>
+    <p class="sub">Daily attendance of facilitators, trainers and Training &amp; Development team members: one record per team
+      member per work date, saved to <b>TDD Team Attendance Monitoring 2026</b>. This is each person's own work attendance;
+      it is not training-session or participant attendance.</p>
   </header>
-  <div id="banner" class="banner off" role="status"></div>
-  <div class="bar"><label>Date<input id="day" type="date"></label></div>
-  <section class="panel">
-    <table>
-      <thead><tr><th>Team member</th><th>Status</th><th>Time in</th><th>Time out</th><th>Work location</th><th>Leave type</th><th>Remarks</th><th></th></tr></thead>
-      <tbody id="rows"><tr><td colspan="8" class="muted">Loading…</td></tr></tbody>
-    </table>
+
+  <div id="status" class="banner info" role="status">Loading…</div>
+
+  <section id="tokenbox" class="panel" hidden>
+    <h2>Access token</h2>
+    <p class="sub" id="tokenmsg">Enter the token an administrator gave you. It is kept for this browser tab only.</p>
+    <form id="tokenform" class="bar"><label>Token<input id="token" type="password" autocomplete="off" spellcheck="false" required></label><button class="primary" type="submit">Connect</button></form>
   </section>
-  <section class="panel">
-    <h2>Monthly KRA for the selected month</h2>
-    <p class="sub">(Days present &minus; Lates &minus; Absences) &divide; Working days, floored at 0. Rest Day, Holiday and On Leave are not working days;
-      Half Day counts as half a day present. These treatments are defaults pending HRAD confirmation.</p>
-    <div id="kra"></div>
-  </section>
+
+  <div id="app" hidden>
+    <div class="bar">
+      <div class="tabs" role="tablist" aria-label="View">
+        <button id="tab-day" type="button" role="tab" aria-selected="true">Daily entry</button>
+        <button id="tab-month" type="button" role="tab" aria-selected="false">Month summary</button>
+      </div>
+      <label>Team member<select id="f-person"></select></label>
+      <div id="nav-day" class="nav"><button id="d-prev" type="button" aria-label="Previous day">&larr;</button><label>Date<input id="f-date" type="date"></label><button id="d-next" type="button" aria-label="Next day">&rarr;</button><button id="d-today" type="button">Today</button></div>
+      <div id="nav-month" class="nav" hidden><button id="m-prev" type="button" aria-label="Previous month">&larr;</button><label>Month<input id="f-month" type="month"></label><button id="m-next" type="button" aria-label="Next month">&rarr;</button><button id="m-this" type="button">This month</button></div>
+      <span class="spacer"></span>
+      <button id="reload" type="button">Reload</button>
+      <button id="signout" type="button" class="quiet">Forget token</button>
+    </div>
+
+    <section id="day-view" class="panel">
+      <div class="head"><h2 id="day-title"></h2><span id="day-count" class="muted"></span></div>
+      <div id="day-empty" class="empty" hidden></div>
+      <div class="scroll">
+        <table class="stack daily">
+          <thead><tr><th>Team member</th><th>Status</th><th>Time in</th><th>Time out</th><th>Work location</th><th>Leave type</th><th>Remarks</th><th></th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <p class="hint">Leave Type is only needed when Status is On Leave. Times are hh:mm. Late = arrived after the official start time.</p>
+      <div id="orphans" class="warns" hidden></div>
+    </section>
+
+    <section id="month-view" class="panel" hidden>
+      <div class="head"><h2 id="month-title"></h2><span id="month-count" class="muted"></span></div>
+      <div id="month-empty" class="empty" hidden></div>
+      <div class="scroll">
+        <table class="stack">
+          <thead><tr><th>Team member</th><th class="num">Records</th><th class="num">Working days</th><th class="num">Days present</th><th class="num">Lates</th><th class="num">Absences</th><th class="num">KRA</th></tr></thead>
+          <tbody id="kra-rows"></tbody>
+        </table>
+      </div>
+      <p class="hint">Formula on record: (Days Present &minus; Lates &minus; Absences) / Total Working Days &times; 100%. Computed from the sheet's records on every load; no figure is typed in.</p>
+      <div id="assume-box" class="warns" hidden><b>* Provisional.</b> HRAD has not confirmed how these are treated, so this rating is not final:<ul id="assumptions"></ul></div>
+      <div id="quality-box" class="warns" hidden><b>Data quality</b><ul id="quality"></ul></div>
+      <div id="detail" class="detail" hidden></div>
+    </section>
+  </div>
 </div>
 <div id="toasts" aria-live="polite"></div>
-<script src="../js/att/errors.js"></script>
-<script src="../js/att/domain.js"></script>
-<script src="../js/att/service.js"></script>
-<script src="../js/att/adapters/memory.js"></script>
-<script src="../js/att/adapters/sheets.js"></script>
-<script src="../js/att/config.js"></script>
-<script src="../js/att/boot.js"></script>
-<script src="../js/att/ui.js"></script>
-<script src="../js/att/facday.js"></script>
+<script src="../js/attendance-logic.js"></script>
+<script src="../js/attendance-api.js"></script>
+<script src="../js/attendance-config.js"></script>
+<script src="../js/attendance-ui.js"></script>
+<script src="../js/attendance.js"></script>
 </body></html>
