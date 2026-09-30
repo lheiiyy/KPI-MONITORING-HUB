@@ -3,5 +3,5 @@
 // key or password in this file. Leave apiUrl empty until the backend is deployed: the page then says it is
 // not configured instead of pretending to work. See docs/ATTENDANCE_MODULE.md.
 window.ATTENDANCE_CONFIG = {
-  apiUrl: ''
+  apiUrl: 'https://script.google.com/macros/s/AKfycbzBKWSpKRmVvVhh8xwiH6HlvFLyj5qc0mPsZALAlNA2MqqJn_tToEC8PCyI9mbi1DhO/exec'
 };
