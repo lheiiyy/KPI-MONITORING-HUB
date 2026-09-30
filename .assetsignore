@@ -1,0 +1,22 @@
+# Excludes these paths from the Cloudflare Workers static assets upload
+# (assets.directory is "." in wrangler.jsonc). Same syntax as .gitignore.
+# node_modules is the one that actually broke the last deploy (wrangler's
+# own workerd binary, 128 MiB, over the 25 MiB per-asset limit). The rest
+# are implementation files with no reason to be publicly fetchable.
+node_modules
+.git
+.wrangler
+package.json
+package-lock.json
+bun.lock
+wrangler.jsonc
+src
+test
+tests
+backend
+apps-script
+scripts
+docs
+netlify
+functions
+*.md
